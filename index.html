@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resik.in - Kebersihan Tanpa Kompromi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        primary: '#0066FF',
+                        secondary: '#EBF3FF',
+                        dark: '#1A233A',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.55);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(4px);
+        }
+        .modal-overlay.open { display: flex; }
+        .modal-box {
+            background: white;
+            border-radius: 24px;
+            padding: 40px 36px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 24px 64px rgba(0,0,0,0.15);
+            animation: slideUp 0.3s ease;
+            position: relative;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(24px); opacity: 0; }
+            to   { transform: translateY(0);    opacity: 1; }
+        }
+        .modal-close {
+            position: absolute;
+            top: 16px; right: 20px;
+            font-size: 24px;
+            color: #94a3b8;
+            cursor: pointer;
+            line-height: 1;
+        }
+        .modal-close:hover { color: #1e293b; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased overflow-x-hidden">
+
+<!-- LOGIN GATE MODAL -->
+<div class="modal-overlay" id="loginGateModal">
+    <div class="modal-box">
+        <span class="modal-close" id="closeLoginGate">&times;</span>
+        <div class="text-center mb-6">
+            <div class="w-14 h-14 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0066FF" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            </div>
+            <h2 class="text-xl font-bold text-slate-900 mb-1">Login Diperlukan</h2>
+            <p class="text-sm text-slate-500">Silakan masuk atau daftar terlebih dahulu untuk mengakses fitur ini.</p>
+        </div>
+        <div class="flex flex-col gap-3">
+            <a href="login_register.html" class="w-full bg-primary text-white py-3 rounded-xl font-semibold text-sm text-center hover:bg-blue-700 transition">Masuk ke Akun</a>
+            <a href="daftar_pelanggan.html" class="w-full border-2 border-primary text-primary py-3 rounded-xl font-semibold text-sm text-center hover:bg-secondary transition">Daftar Akun Baru</a>
+        </div>
+        <p class="text-center text-xs text-slate-400 mt-4">Ingin bergabung sebagai mitra? <a href="daftar_mitra.html" class="text-primary font-semibold hover:underline">Daftar Mitra</a></p>
+    </div>
+</div>
+
+<!-- NAVBAR -->
+<nav class="w-full bg-slate-50 py-4 px-6 md:px-16 lg:px-24 flex items-center justify-between z-50 relative sticky top-0 border-b border-slate-100 bg-white/80 backdrop-blur-md" style="background:rgba(248,250,252,0.9)">
+    <a href="index.html">
+        <svg width="120" height="40" viewBox="0 0 148 148" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+            <rect width="148" height="148" fill="url(#pattern_nav)"/>
+            <defs><pattern id="pattern_nav" patternContentUnits="objectBoundingBox" width="1" height="1"><use xlink:href="#img_nav" transform="scale(0.002)"/></pattern>
+            <image id="img_nav" width="500" height="500" preserveAspectRatio="none" xlink:href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAwIiBoZWlnaHQ9IjUwMCIgdmlld0JveD0iMCAwIDUwMCA1MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjUwMCIgaGVpZ2h0PSI1MDAiIGZpbGw9IiMwMDY2RkYiIHJ4PSI2MCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTglIiBmb250LXNpemU9IjE4MCIgZm9udC1mYW1pbHk9IkludGVyLCBzYW5zLXNlcmlmIiBmb250LXdlaWdodD0iODAwIiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+UjwvdGV4dD48L3N2Zz4="/></defs>
+        </svg>
+    </a>
+
+    <!-- Desktop Menu -->
+    <div class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600">
+        <a href="index.html" class="text-primary border-b-2 border-primary pb-1">Beranda</a>
+        <a href="#" class="hover:text-primary transition-colors nav-protected" data-page="layanan">Layanan</a>
+        <a href="#" class="hover:text-primary transition-colors nav-protected" data-page="membership">Membership</a>
+        <a href="#" class="hover:text-primary transition-colors nav-protected" data-page="pesanan">Pesanan Saya</a>
+        <a href="#" class="hover:text-primary transition-colors nav-protected" data-page="profil">Profil</a>
+    </div>
+
+    <!-- Auth Buttons -->
+    <div class="hidden md:flex items-center gap-3" id="navAuthArea"></div>
+
+    <!-- Mobile menu button -->
+    <button class="md:hidden text-slate-600" onclick="toggleMobileMenu()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+    </button>
+</nav>
+
+<!-- Mobile Menu -->
+<div id="mobileMenu" class="hidden md:hidden bg-white border-b border-slate-100 px-6 py-4 space-y-3">
+    <a href="index.html" class="block text-sm font-medium text-primary">Beranda</a>
+    <a href="#" class="block text-sm font-medium text-slate-600 nav-protected" data-page="layanan">Layanan</a>
+    <a href="#" class="block text-sm font-medium text-slate-600 nav-protected" data-page="membership">Membership</a>
+    <a href="#" class="block text-sm font-medium text-slate-600 nav-protected" data-page="pesanan">Pesanan Saya</a>
+    <a href="#" class="block text-sm font-medium text-slate-600 nav-protected" data-page="profil">Profil</a>
+    <div class="pt-2 border-t border-slate-100" id="mobileAuthArea"></div>
+</div>
+
+<!-- HERO -->
+<section class="w-full bg-slate-50 pt-10 pb-20 px-6 md:px-16 lg:px-24 flex flex-col md:flex-row items-center justify-between gap-12">
+    <div class="flex-1 space-y-6">
+        <div class="inline-flex items-center gap-2 bg-secondary text-primary px-4 py-2 rounded-full text-sm font-medium">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            Pilihan No. 1 Urban Professional
+        </div>
+        <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight text-slate-900">
+            Kebersihan Tanpa <br>Kompromi, <br>
+            <span class="text-primary">Hidup Lebih Nyaman.</span>
+        </h1>
+        <p class="text-slate-600 text-lg max-w-lg leading-relaxed">
+            Kembalikan kesegaran hunian Anda dengan layanan kebersihan profesional yang efisien dan tepercaya.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 pt-4">
+            <button onclick="aksesProtected('pesan')" class="bg-primary text-white px-8 py-3.5 rounded-xl font-semibold text-lg hover:bg-blue-700 transition shadow-lg shadow-blue-500/30">
+                Pesan Sekarang
+            </button>
+            <button onclick="aksesProtected('layanan')" class="bg-white text-primary border-2 border-primary/20 px-8 py-3.5 rounded-xl font-semibold text-lg hover:bg-secondary transition">
+                Lihat Layanan
+            </button>
+        </div>
+        <div class="flex items-center gap-4 pt-6">
+            <div class="flex -space-x-3">
+                <div class="w-10 h-10 rounded-full bg-slate-300 border-2 border-white overflow-hidden"><img src="https://i.pravatar.cc/100?img=1" alt="user"></div>
+                <div class="w-10 h-10 rounded-full bg-slate-400 border-2 border-white overflow-hidden"><img src="https://i.pravatar.cc/100?img=2" alt="user"></div>
+                <div class="w-10 h-10 rounded-full bg-slate-500 border-2 border-white overflow-hidden"><img src="https://i.pravatar.cc/100?img=3" alt="user"></div>
+            </div>
+            <div>
+                <div class="flex text-yellow-400 text-sm">★★★★★</div>
+                <p class="text-xs text-slate-500 font-medium">4.9/5 dari 10.000+ Pelanggan</p>
+            </div>
+        </div>
+    </div>
+    <div class="flex-1 relative w-full flex justify-center lg:justify-end">
+        <div class="absolute inset-0 bg-secondary rounded-[3rem] transform translate-x-4 translate-y-4 -z-10"></div>
+        <img src="https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=800&q=80" alt="Petugas Kebersihan Profesional" class="w-full h-full object-cover rounded-[2rem]">
+        <div class="absolute bottom-6 left-0 md:-left-8 bg-white/90 backdrop-blur-sm p-4 rounded-xl shadow-xl flex items-center gap-3 border border-slate-100">
+            <div class="bg-primary text-white p-2 rounded-full">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            </div>
+            <div>
+                <p class="text-sm font-bold text-slate-800">Respon Cepat</p>
+                <p class="text-xs text-slate-500">Kurang dari 30 Menit</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- PRICING -->
+<section class="w-full bg-white py-20 px-6 md:px-16 lg:px-24">
+    <div class="text-center max-w-2xl mx-auto mb-16">
+        <h2 class="text-3xl font-bold text-slate-900 mb-4">Pilihan Paket Hemat KOST</h2>
+        <p class="text-slate-600">Solusi kebersihan praktis untuk kamar kost, apartemen, atau studio Anda.</p>
+        <div class="h-1 w-16 bg-primary mx-auto mt-6 rounded-full"></div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="bg-white border border-slate-100 rounded-3xl p-8 shadow-sm hover:shadow-lg transition-shadow">
+            <div class="w-12 h-12 bg-secondary text-primary rounded-xl flex items-center justify-center mb-6">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+            </div>
+            <h3 class="text-xl font-bold mb-2">Kamar</h3>
+            <p class="text-sm text-slate-500 mb-6">Fokus pada area tidur, pengaturan tempat tidur, dan debu permukaan.</p>
+            <div class="space-y-3 mb-8">
+                <div class="bg-slate-50 p-4 rounded-xl flex justify-between items-center">
+                    <div><p class="font-semibold text-sm">Standard Clean</p><p class="text-xs text-slate-500">Dusting & Sweeping</p></div>
+                    <span class="text-primary font-bold">Rp 45rb</span>
+                </div>
+                <div class="bg-slate-50 p-4 rounded-xl flex justify-between items-center">
+                    <div><p class="font-semibold text-sm">Deep Clean</p><p class="text-xs text-slate-500">Sanitasi & Vacuum Tungau</p></div>
+                    <span class="text-primary font-bold">Rp 85rb</span>
+                </div>
+            </div>
+            <button onclick="aksesProtected('pesan')" class="w-full py-3 rounded-xl border-2 border-primary text-primary font-semibold hover:bg-secondary transition">Pilih Paket</button>
+        </div>
+        <div class="bg-white border border-slate-100 rounded-3xl p-8 shadow-sm hover:shadow-lg transition-shadow">
+            <div class="w-12 h-12 bg-secondary text-primary rounded-xl flex items-center justify-center mb-6">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12h20M7 12v5M17 12v5M4 17h16M12 2v10"></path></svg>
+            </div>
+            <h3 class="text-xl font-bold mb-2">Kamar Mandi</h3>
+            <p class="text-sm text-slate-500 mb-6">Pembersihan kerak air, kloset, dan sanitasi menyeluruh.</p>
+            <div class="space-y-3 mb-8">
+                <div class="bg-slate-50 p-4 rounded-xl flex justify-between items-center">
+                    <div><p class="font-semibold text-sm">Standard Clean</p><p class="text-xs text-slate-500">Sikat Lantai & Kloset</p></div>
+                    <span class="text-primary font-bold">Rp 35rb</span>
+                </div>
+                <div class="bg-slate-50 p-4 rounded-xl flex justify-between items-center">
+                    <div><p class="font-semibold text-sm">Deep Clean</p><p class="text-xs text-slate-500">Kerak Membandel & Fogging</p></div>
+                    <span class="text-primary font-bold">Rp 75rb</span>
+                </div>
+            </div>
+            <button onclick="aksesProtected('pesan')" class="w-full py-3 rounded-xl border-2 border-primary text-primary font-semibold hover:bg-secondary transition">Pilih Paket</button>
+        </div>
+        <div class="bg-primary rounded-3xl p-8 shadow-xl relative overflow-hidden text-white">
+            <div class="absolute top-4 right-4 bg-blue-400 text-white text-[10px] font-bold px-3 py-1 rounded-full">TERLARIS</div>
+            <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mb-6">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
+            </div>
+            <h3 class="text-xl font-bold mb-2">Paket Kombo</h3>
+            <p class="text-sm text-blue-100 mb-6">Solusi total Kamar + Kamar Mandi dengan harga lebih hemat.</p>
+            <div class="space-y-3 mb-8">
+                <div class="bg-white text-slate-800 p-4 rounded-xl flex justify-between items-center shadow-inner">
+                    <div><p class="font-semibold text-sm">Standard Clean</p><p class="text-xs text-slate-500">Hemat Rp 5.000</p></div>
+                    <span class="text-primary font-bold">Rp 75rb</span>
+                </div>
+                <div class="bg-blue-700/50 p-4 rounded-xl flex justify-between items-center border border-blue-500">
+                    <div><p class="font-semibold text-sm text-white">Deep Clean</p><p class="text-xs text-blue-200">Hemat Rp 10.000</p></div>
+                    <span class="text-white font-bold">Rp 150rb</span>
+                </div>
+            </div>
+            <button onclick="aksesProtected('pesan')" class="w-full py-3 rounded-xl bg-white text-primary font-bold hover:bg-slate-100 transition shadow-lg">Ambil Kombo</button>
+        </div>
+    </div>
+</section>
+
+<!-- MEMBERSHIP -->
+<section class="w-full bg-slate-50 py-20 px-6 md:px-16 lg:px-24">
+    <div class="flex flex-col lg:flex-row gap-16 items-center">
+        <div class="lg:w-2/5 space-y-6">
+            <h2 class="text-3xl lg:text-4xl font-bold text-slate-900 leading-tight">Nikmati Keuntungan Eksklusif Membership</h2>
+            <p class="text-slate-600 leading-relaxed">Dapatkan layanan rutin dengan harga jauh lebih murah dan prioritas pemesanan setiap saat.</p>
+            <div class="space-y-4 pt-4">
+                <div class="flex items-center gap-3"><div class="w-6 h-6 rounded-full bg-secondary flex items-center justify-center text-primary"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></div><span class="font-semibold text-sm text-slate-800">Cashback Setiap Transaksi</span></div>
+                <div class="flex items-center gap-3"><div class="w-6 h-6 rounded-full bg-secondary flex items-center justify-center text-primary"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></div><span class="font-semibold text-sm text-slate-800">Prioritas Layanan Peak Hour</span></div>
+                <div class="flex items-center gap-3"><div class="w-6 h-6 rounded-full bg-secondary flex items-center justify-center text-primary"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></div><span class="font-semibold text-sm text-slate-800">Gratis Fogging Disinfektan</span></div>
+            </div>
+        </div>
+        <div class="lg:w-3/5 grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+            <div class="bg-white rounded-3xl p-8 shadow-xl border border-slate-100 flex flex-col h-full">
+                <div class="flex justify-between items-start mb-6">
+                    <span class="bg-secondary text-primary text-[10px] font-bold px-3 py-1 rounded-full">BASIC ELITE</span>
+                    <svg class="text-primary" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>
+                </div>
+                <h3 class="text-xl font-bold text-slate-900 mb-2">VIP Membership</h3>
+                <div class="mb-8"><span class="text-3xl font-bold text-slate-900">Rp 155.000</span><span class="text-slate-500 text-sm"> / bulan</span></div>
+                <ul class="space-y-4 mb-8 flex-1">
+                    <li class="flex items-start gap-2 text-sm text-slate-600"><svg class="text-primary mt-1 shrink-0" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>4x Pembersihan Standard</li>
+                    <li class="flex items-start gap-2 text-sm text-slate-600"><svg class="text-primary mt-1 shrink-0" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>Voucher Diskon 10%</li>
+                    <li class="flex items-start gap-2 text-sm text-slate-600"><svg class="text-primary mt-1 shrink-0" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>Gratis Biaya Admin</li>
+                </ul>
+                <button onclick="aksesProtected('membership')" class="w-full py-3 rounded-xl bg-primary text-white font-semibold hover:bg-blue-700 transition">Daftar VIP</button>
+            </div>
+            <div class="bg-dark rounded-3xl p-8 shadow-2xl relative flex flex-col h-full transform md:scale-105 z-10 border border-slate-700">
+                <div class="absolute top-0 right-6 bg-primary text-white text-[10px] font-bold px-3 py-1 rounded-b-lg">BEST VALUE</div>
+                <div class="flex justify-between items-start mb-6">
+                    <span class="bg-slate-800 text-slate-300 text-[10px] font-bold px-3 py-1 rounded-full">ULTIMATE ELITE</span>
+                    <svg class="text-white" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-2">VVIP Membership</h3>
+                <div class="mb-8"><span class="text-3xl font-bold text-white">Rp 295.000</span><span class="text-slate-400 text-sm"> / bulan</span></div>
+                <ul class="space-y-4 mb-8 flex-1">
+                    <li class="flex items-start gap-2 text-sm text-slate-300"><svg class="text-blue-400 mt-1 shrink-0" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>8x Pembersihan (Mix Standard/Deep)</li>
+                    <li class="flex items-start gap-2 text-sm text-slate-300"><svg class="text-blue-400 mt-1 shrink-0" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>Voucher Diskon 25% Selamanya</li>
+                    <li class="flex items-start gap-2 text-sm text-slate-300"><svg class="text-blue-400 mt-1 shrink-0" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>Personal Assistant Cleaning</li>
+                    <li class="flex items-start gap-2 text-sm text-slate-300"><svg class="text-blue-400 mt-1 shrink-0" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>Jaminan Reschedule Tanpa Batas</li>
+                </ul>
+                <button onclick="aksesProtected('membership')" class="w-full py-3 rounded-xl bg-secondary text-primary font-bold hover:bg-white transition">Daftar VVIP</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FEATURES -->
+<section class="w-full bg-white py-20 px-6 md:px-16 lg:px-24 text-center">
+    <h2 class="text-3xl font-bold text-slate-900 mb-4">Kenapa Resik.in Berbeda?</h2>
+    <p class="text-slate-600 max-w-2xl mx-auto mb-16">Kepercayaan Anda adalah prioritas kami.</p>
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
+        <div class="flex flex-col items-center text-center">
+            <div class="w-16 h-16 bg-secondary text-primary rounded-full flex items-center justify-center mb-4"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><polyline points="9 12 11 14 15 10"></polyline></svg></div>
+            <h4 class="font-bold text-slate-900 mb-2">Partner Terverifikasi</h4>
+            <p class="text-xs text-slate-500 leading-relaxed">Setiap mitra kami melewati seleksi ketat dan pelatihan profesional.</p>
+        </div>
+        <div class="flex flex-col items-center text-center">
+            <div class="w-16 h-16 bg-secondary text-primary rounded-full flex items-center justify-center mb-4"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><path d="M3.27 6.96L12 12.01l8.73-5.05"></path><line x1="12" y1="22.08" x2="12" y2="12"></line></svg></div>
+            <h4 class="font-bold text-slate-900 mb-2">Peralatan Eco-Friendly</h4>
+            <p class="text-xs text-slate-500 leading-relaxed">Menggunakan bahan pembersih ramah lingkungan dan aman bagi keluarga.</p>
+        </div>
+        <div class="flex flex-col items-center text-center">
+            <div class="w-16 h-16 bg-secondary text-primary rounded-full flex items-center justify-center mb-4"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></div>
+            <h4 class="font-bold text-slate-900 mb-2">Asuransi Layanan</h4>
+            <p class="text-xs text-slate-500 leading-relaxed">Jaminan keamanan barang-barang Anda selama proses pembersihan.</p>
+        </div>
+        <div class="flex flex-col items-center text-center">
+            <div class="w-16 h-16 bg-secondary text-primary rounded-full flex items-center justify-center mb-4"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M8 14s1.5 2 4 2 4-2 4-2"></path><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line></svg></div>
+            <h4 class="font-bold text-slate-900 mb-2">Kepuasan 100%</h4>
+            <p class="text-xs text-slate-500 leading-relaxed">Tidak puas? Kami akan membersihkan ulang secara gratis.</p>
+        </div>
+    </div>
+</section>
+
+<!-- MITRA SECTION -->
+<section class="w-full bg-slate-100 py-20 px-6 md:px-16 lg:px-24 text-center">
+    <h2 class="text-3xl font-bold text-slate-900 mb-4">Ayo Bergabung Sebagai Mitra Kebersihan Resik.in!</h2>
+    <p class="text-slate-600 max-w-2xl mx-auto mb-12">Ubah Keahlian Anda Menjadi Penghasilan Utama.</p>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 max-w-5xl mx-auto">
+        <div class="bg-white p-8 rounded-2xl shadow-sm flex flex-col items-center">
+            <div class="w-14 h-14 bg-secondary text-primary rounded-xl flex items-center justify-center mb-4"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></div>
+            <p class="text-sm text-slate-700 font-medium">Pilih jadwal kerja yang sesuai dengan kebutuhan Anda.</p>
+        </div>
+        <div class="bg-white p-8 rounded-2xl shadow-sm flex flex-col items-center">
+            <div class="w-14 h-14 bg-secondary text-primary rounded-xl flex items-center justify-center mb-4"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"></rect><circle cx="12" cy="12" r="2"></circle><path d="M6 12h.01M18 12h.01"></path></svg></div>
+            <p class="text-sm text-slate-700 font-medium">Dapatkan sistem bagi hasil yang adil dan transparan.</p>
+        </div>
+        <div class="bg-white p-8 rounded-2xl shadow-sm flex flex-col items-center">
+            <div class="w-14 h-14 bg-secondary text-primary rounded-xl flex items-center justify-center mb-4"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 6 6 1-4 4 1 6-6-3-6 3 1-6-4-4 6-1z"></path></svg></div>
+            <p class="text-sm text-slate-700 font-medium">Akses ke pelatihan profesional dan tim dukungan siap membantu.</p>
+        </div>
+    </div>
+    <a href="daftar_mitra.html" class="inline-block bg-primary text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-blue-700 transition shadow-lg">
+        Daftar Sebagai Mitra Sekarang
+    </a>
+</section>
+
+<!-- BOTTOM CTA -->
+<section class="w-full bg-blue-700 py-24 px-6 md:px-16 lg:px-24 text-center relative overflow-hidden">
+    <div class="absolute -top-24 -left-24 w-64 h-64 bg-blue-600 rounded-full mix-blend-multiply filter blur-2xl opacity-70"></div>
+    <div class="absolute -bottom-24 -right-24 w-64 h-64 bg-blue-800 rounded-full mix-blend-multiply filter blur-2xl opacity-70"></div>
+    <div class="relative z-10 max-w-3xl mx-auto">
+        <h2 class="text-3xl md:text-5xl font-bold text-white mb-6">Siap Merasakan Kebersihan Maksimal?</h2>
+        <p class="text-blue-100 text-lg mb-10">Bergabunglah dengan ribuan pengguna puas lainnya. Pesan layanan pertama Anda hari ini.</p>
+        <div class="flex flex-col sm:flex-row justify-center gap-4">
+            <button onclick="aksesProtected('pesan')" class="bg-white text-primary px-8 py-3.5 rounded-xl font-bold text-lg hover:bg-slate-100 transition shadow-lg">Pesan Sekarang</button>
+            <button onclick="aksesProtected('kontak')" class="bg-transparent text-white border-2 border-white px-8 py-3.5 rounded-xl font-bold text-lg hover:bg-white/10 transition">Hubungi Kami</button>
+        </div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="w-full bg-slate-200/60 pt-16 pb-8 px-6 md:px-16 lg:px-24 text-slate-600 text-sm">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
+        <div class="md:col-span-1 space-y-4">
+            <div class="flex items-center gap-2 mb-4">
+                <div class="text-primary"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg></div>
+                <span class="text-xl font-bold text-primary">Resik.in</span>
+            </div>
+            <p class="text-slate-500 leading-relaxed">Solusi kebersihan modern untuk gaya hidup perkotaan yang dinamis.</p>
+        </div>
+        <div class="space-y-4">
+            <h4 class="font-bold text-slate-900 mb-4 tracking-wider text-xs">LAYANAN</h4>
+            <ul class="space-y-3">
+                <li><a href="#" onclick="aksesProtected('layanan'); return false;" class="hover:text-primary transition">Pembersihan Harian</a></li>
+                <li><a href="#" onclick="aksesProtected('layanan'); return false;" class="hover:text-primary transition">Deep Cleaning</a></li>
+                <li><a href="#" onclick="aksesProtected('layanan'); return false;" class="hover:text-primary transition">Sanitasi & Fogging</a></li>
+                <li><a href="#" onclick="aksesProtected('layanan'); return false;" class="hover:text-primary transition">Cuci AC</a></li>
+            </ul>
+        </div>
+        <div class="space-y-4">
+            <h4 class="font-bold text-slate-900 mb-4 tracking-wider text-xs">PERUSAHAAN</h4>
+            <ul class="space-y-3">
+                <li><a href="#" class="hover:text-primary transition">Tentang Kami</a></li>
+                <li><a href="daftar_mitra.html" class="hover:text-primary transition">Karir / Mitra</a></li>
+                <li><a href="#" class="hover:text-primary transition">Syarat & Ketentuan</a></li>
+                <li><a href="#" class="hover:text-primary transition">Kebijakan Privasi</a></li>
+            </ul>
+        </div>
+        <div class="space-y-4">
+            <h4 class="font-bold text-slate-900 mb-4 tracking-wider text-xs">AKUN</h4>
+            <ul class="space-y-3">
+                <li><a href="login_register.html" class="hover:text-primary transition">Masuk</a></li>
+                <li><a href="daftar_pelanggan.html" class="hover:text-primary transition">Daftar Pelanggan</a></li>
+                <li><a href="daftar_mitra.html" class="hover:text-primary transition">Daftar Mitra</a></li>
+                <li><a href="#" onclick="aksesProtected('pesanan'); return false;" class="hover:text-primary transition">Pesanan Saya</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="border-t border-slate-300 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
+        <p>© 2024 Resik.in. Kebersihan Tanpa Kompromi.</p>
+        <div class="flex gap-6 text-xs font-medium">
+            <a href="#" class="hover:text-primary transition">Bantuan</a>
+            <a href="#" class="hover:text-primary transition">Syarat & Ketentuan</a>
+            <a href="#" class="hover:text-primary transition">Tentang Kami</a>
+        </div>
+    </div>
+</footer>
+
+<script>
+    // ============================================================
+    // PETA HALAMAN: key = nama page, value = URL tujuan per role
+    // ============================================================
+    const PAGE_MAP = {
+        // Pelanggan biasa
+        pelanggan: {
+            pesan:      'katalog_layanan.html',
+            layanan:    'katalog_layanan.html',
+            membership: 'membership.html',
+            pesanan:    'lacak_pesanan.html',
+            profil:     'edit_profil_pelanggan.html',
+            kontak:     '#',
+        },
+        // Penyedia jasa / mitra
+        mitra: {
+            pesan:      'dashboard_mitra.html',
+            layanan:    'layanan_mitra.html',
+            membership: 'dashboard_mitra.html',
+            pesanan:    'pesanan_masuk_mitra.html',
+            profil:     'profil_mitra.html',
+            kontak:     '#',
+        },
+        // Admin
+        admin: {
+            pesan:      'dashboard_admin.html',
+            layanan:    'dashboard_admin.html',
+            membership: 'dashboard_admin.html',
+            pesanan:    'dashboard_admin.html',
+            profil:     'dashboard_admin.html',
+            kontak:     '#',
+        },
+    };
+
+    // ============================================================
+    // HELPER: cek login & ambil data user
+    // ============================================================
+    function isLoggedIn() {
+        const raw = localStorage.getItem('resik_user');
+        if (!raw) return false;
+        try { return !!JSON.parse(raw).id_user; } catch { return false; }
+    }
+
+    function getUser() {
+        try { return JSON.parse(localStorage.getItem('resik_user') || '{}'); } catch { return {}; }
+    }
+
+    // Kembalikan peta halaman sesuai role user
+    function getPageMap() {
+        const user = getUser();
+        const role = (user.role || '').toLowerCase();
+        if (role === 'penyedia jasa') return PAGE_MAP.mitra;
+        if (role === 'admin')         return PAGE_MAP.admin;
+        return PAGE_MAP.pelanggan;
+    }
+
+    // ============================================================
+    // RENDER NAVBAR sesuai status login
+    // ============================================================
+    function renderNav() {
+        const navArea    = document.getElementById('navAuthArea');
+        const mobileArea = document.getElementById('mobileAuthArea');
+
+        if (isLoggedIn()) {
+            const user    = getUser();
+            const role    = (user.role || '').toLowerCase();
+            const isMitra = role === 'penyedia jasa';
+            const isAdmin = role === 'admin';
+
+            const dashLink = isMitra ? 'dashboard_mitra.html'
+                           : isAdmin ? 'dashboard_admin.html'
+                           : 'dashboard.html';
+
+            // Perbarui href nav-protected sesuai role agar klik langsung redirect
+            updateNavLinks();
+
+            navArea.innerHTML = `
+                <a href="${dashLink}" class="text-sm font-semibold text-slate-700 hover:text-primary transition">Dashboard</a>
+                <div class="relative group">
+                    <button class="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-blue-700 transition">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                        ${user.nama ? user.nama.split(' ')[0] : 'Akun'}
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </button>
+                    <div class="absolute right-0 mt-2 w-44 bg-white border border-slate-100 rounded-xl shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+                        <a href="${dashLink}" class="block px-4 py-3 text-sm text-slate-700 hover:bg-slate-50 rounded-t-xl">Dashboard</a>
+                        <a href="${getPageMap().profil}" class="block px-4 py-3 text-sm text-slate-700 hover:bg-slate-50">Profil Saya</a>
+                        <button onclick="logout()" class="w-full text-left px-4 py-3 text-sm text-red-500 hover:bg-red-50 rounded-b-xl">Keluar</button>
+                    </div>
+                </div>`;
+
+            mobileArea.innerHTML = `
+                <a href="${dashLink}" class="block text-sm font-semibold text-primary mb-2">Dashboard</a>
+                <button onclick="logout()" class="block text-sm text-red-500 font-semibold">Keluar</button>`;
+        } else {
+            navArea.innerHTML = `
+                <a href="login_register.html" class="text-sm font-medium text-slate-600 hover:text-primary transition px-3 py-2">Masuk</a>
+                <a href="daftar_pelanggan.html" class="bg-primary text-white px-6 py-2.5 rounded-full text-sm font-medium hover:bg-blue-700 transition shadow-md">Sign Up</a>`;
+
+            mobileArea.innerHTML = `
+                <a href="login_register.html" class="block text-sm font-medium text-slate-600 mb-2">Masuk</a>
+                <a href="daftar_pelanggan.html" class="block text-sm font-bold text-primary">Sign Up</a>`;
+        }
+    }
+
+    // ============================================================
+    // UPDATE HREF nav-protected agar langsung redirect saat login
+    // ============================================================
+    function updateNavLinks() {
+        if (!isLoggedIn()) return;
+        const map = getPageMap();
+        document.querySelectorAll('.nav-protected').forEach(link => {
+            const page = link.dataset.page;
+            if (map[page]) link.href = map[page];
+        });
+    }
+
+    // ============================================================
+    // FUNGSI AKSES HALAMAN TERPROTEKSI
+    // Jika sudah login → redirect langsung ke halaman tujuan
+    // Jika belum login → tampilkan modal login
+    // ============================================================
+    function aksesProtected(page) {
+        if (isLoggedIn()) {
+            const dest = getPageMap()[page] || 'dashboard.html';
+            if (dest && dest !== '#') window.location.href = dest;
+        } else {
+            openModal();
+        }
+    }
+
+    // ============================================================
+    // EVENT: klik nav-protected
+    // Jika sudah login → ikuti href yang sudah diupdate
+    // Jika belum login → cegah navigasi & tampilkan modal
+    // ============================================================
+    document.querySelectorAll('.nav-protected').forEach(link => {
+        link.addEventListener('click', function(e) {
+            if (!isLoggedIn()) {
+                e.preventDefault();
+                openModal();
+            }
+            // Jika sudah login, href sudah diisi updateNavLinks() → biarkan browser navigasi
+        });
+    });
+
+    // ============================================================
+    // MODAL
+    // ============================================================
+    function openModal()  { document.getElementById('loginGateModal').classList.add('open'); }
+    function closeModal() { document.getElementById('loginGateModal').classList.remove('open'); }
+
+    document.getElementById('closeLoginGate').addEventListener('click', closeModal);
+    document.getElementById('loginGateModal').addEventListener('click', function(e) {
+        if (e.target === this) closeModal();
+    });
+
+    // ============================================================
+    // LOGOUT
+    // ============================================================
+    function logout() {
+        localStorage.removeItem('resik_user');
+        window.location.reload();
+    }
+
+    // ============================================================
+    // MOBILE MENU
+    // ============================================================
+    function toggleMobileMenu() {
+        document.getElementById('mobileMenu').classList.toggle('hidden');
+    }
+
+    // ============================================================
+    // INIT
+    // ============================================================
+    renderNav();
+    updateNavLinks();
+</script>
+</body>
+</html>

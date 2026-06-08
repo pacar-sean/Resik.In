@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mitra Resik.in - Sedang Berjalan</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --primary-color: #0056D6;
+            --accent-color: #007BFF;
+            --text-dark: #1D2939;
+            --text-gray: #667085;
+            --bg-light: #F9FAFB;
+            --white: #FFFFFF;
+            --border-radius: 12px;
+            --foto-mitra: url('foto-mitra.svg');
+            --border-light: #EAECF0;
+            --danger-color: #DC2626;
+            --success-color: #10B981;
+            --badge-blue-bg: #E8F2FF;
+            --badge-gray-bg: #F2F4F7;
+            --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.03);
+            --sidebar-width: 260px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif; }
+        body { background-color: var(--bg-light); color: var(--text-dark); display: flex; min-height: 100vh; -webkit-font-smoothing: antialiased; }
+        a { text-decoration: none; color: inherit; }
+        button { cursor: pointer; font-family: inherit; border: none; outline: none; transition: all 0.2s ease; }
+
+        .sidebar { width: var(--sidebar-width); background-color: var(--white); border-right: 1px solid var(--border-light); display: flex; flex-direction: column; padding: 24px 20px; position: fixed; height: 100vh; z-index: 10; }
+        .brand-logo { font-size: 24px; font-weight: 700; color: var(--primary-color); margin-bottom: 32px; padding-left: 12px; letter-spacing: -0.5px; }
+        .sidebar-profile { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; padding-left: 12px; }
+        .avatar-wrapper { position: relative; width: 48px; height: 48px; }
+        .profile-avatar { width: 100%; height: 100%; border-radius: 50%; background-image: var(--foto-mitra); background-size: cover; background-position: center; background-color: #D1E0FF; border: 2px solid var(--white); }
+        .status-dot { position: absolute; bottom: 2px; right: 0px; width: 12px; height: 12px; background-color: var(--success-color); border-radius: 50%; border: 2px solid var(--white); }
+        .profile-info { display: flex; flex-direction: column; }
+        .profile-name { font-size: 15px; font-weight: 600; color: var(--text-dark); }
+        .profile-status { font-size: 12px; color: var(--text-gray); }
+        .nav-menu { display: flex; flex-direction: column; gap: 4px; flex-grow: 1; }
+        .nav-link { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 8px; color: var(--text-gray); font-weight: 500; font-size: 14px; transition: all 0.2s ease; }
+        .nav-link svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        .nav-link:hover { background-color: var(--bg-light); color: var(--text-dark); }
+        .nav-link.active { background-color: var(--primary-color); color: var(--white); font-weight: 600; }
+        .btn-logout { display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: var(--danger-color); font-weight: 600; font-size: 14px; margin-top: auto; border-radius: 8px; background: transparent; }
+        .btn-logout svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        .btn-logout:hover { background-color: #FEE2E2; }
+
+        .main-content { margin-left: var(--sidebar-width); padding: 40px 48px; width: calc(100% - var(--sidebar-width)); display: flex; flex-direction: column; }
+        .page-header { margin-bottom: 32px; }
+        .page-title { font-size: 28px; font-weight: 700; color: var(--text-dark); margin-bottom: 8px; }
+        .page-subtitle { font-size: 15px; color: var(--text-gray); }
+
+        .tabs-container { display: flex; gap: 32px; border-bottom: 1px solid var(--border-light); margin-bottom: 32px; }
+        .tab-item { padding: 12px 0; font-size: 15px; font-weight: 500; color: var(--text-gray); position: relative; cursor: pointer; }
+        .tab-item:hover { color: var(--text-dark); }
+        .tab-item.active { color: var(--primary-color); font-weight: 600; }
+        .tab-item.active::after { content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 3px; background-color: var(--primary-color); border-radius: 3px 3px 0 0; }
+
+        .orders-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
+
+        .order-card { background-color: var(--white); border-radius: var(--border-radius); border: 1px solid var(--border-light); padding: 24px; box-shadow: var(--shadow-card); display: flex; flex-direction: column; transition: box-shadow 0.2s ease, transform 0.2s ease; }
+        .order-card:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.06); transform: translateY(-2px); }
+
+        .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+        .badge-group { display: flex; gap: 8px; flex-wrap: wrap; }
+        .badge { font-size: 10px; font-weight: 700; padding: 4px 10px; border-radius: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .badge-primary { background-color: var(--badge-blue-bg); color: var(--primary-color); }
+        .badge-secondary { background-color: var(--badge-gray-bg); color: var(--text-gray); }
+        .revenue-info { text-align: right; display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; margin-left: 12px; }
+        .revenue-label { font-size: 10px; font-weight: 600; color: var(--text-gray); text-transform: uppercase; }
+        .revenue-amount { font-size: 16px; font-weight: 700; color: var(--primary-color); }
+
+        .order-id { font-size: 13px; color: var(--text-gray); margin-bottom: 8px; }
+        .service-name { font-size: 20px; font-weight: 700; color: var(--text-dark); margin-bottom: 16px; }
+
+        .order-details-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
+        .detail-item { display: flex; align-items: flex-start; gap: 10px; font-size: 14px; color: var(--text-gray); line-height: 1.4; }
+        .detail-item svg { width: 18px; height: 18px; flex-shrink: 0; margin-top: 1px; stroke: var(--text-gray); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+        .btn-selesai { width: 100%; background-color: var(--success-color); color: var(--white); padding: 14px; border-radius: 8px; font-size: 14px; font-weight: 600; display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: auto; }
+        .btn-selesai:hover { background-color: #0ea271; }
+        .btn-selesai:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .empty-state { grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: var(--text-gray); font-size: 15px; font-weight: 500; }
+        .loading-state { grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: var(--text-gray); font-size: 15px; }
+
+        @media (max-width: 1024px) { .orders-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 768px) { .sidebar { display: none; } .main-content { margin-left: 0; width: 100%; padding: 24px; } }
+    </style>
+</head>
+<body>
+
+<aside class="sidebar">
+    <div class="brand-logo">Mitra Resik.in</div>
+    
+    <div class="sidebar-profile">
+        <div class="avatar-wrapper">
+            <div class="profile-avatar"></div>
+            <div class="status-dot"></div>
+        </div>
+        <div class="profile-info">
+            <span class="profile-name" id="sidebar-nama">-</span>
+            <span class="profile-status">Status: Aktif</span>
+        </div>
+    </div>
+
+    <nav class="nav-menu">
+        <a href="dashboard_mitra.html" class="nav-link">
+            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect></svg>
+            Dashboard
+        </a>
+        <a href="pesanan_masuk_mitra.html" class="nav-link active">
+            <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+            Pesanan
+        </a>
+        <a href="keuangan_mitra.html" class="nav-link">
+            <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
+            Keuangan
+        </a>
+        <a href="layanan_mitra.html" class="nav-link">
+            <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+            Layanan
+        </a>
+        <a href="profil_mitra.html" class="nav-link">
+            <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            Profil
+        </a>
+        <a href="chat.html" class="nav-link">
+            <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+            Chat
+        </a>
+    </nav>
+
+    <button class="btn-logout" id="btn-logout">
+        <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+        Keluar
+    </button>
+</aside>
+
+<main class="main-content">
+    <header class="page-header">
+        <h1 class="page-title">Daftar Pesanan</h1>
+        <p class="page-subtitle">Kelola pesanan yang sedang berjalan dan pantau progres pekerjaan Anda.</p>
+    </header>
+
+    <div class="tabs-container">
+        <a href="pesanan_masuk_mitra.html" class="tab-item">Pesanan Masuk</a>
+        <a href="pesanan_berjalan_mitra.html" class="tab-item active">Sedang Berjalan</a>
+        <a href="riwayat_pesanan_mitra.html" class="tab-item">Riwayat Selesai</a>
+    </div>
+
+    <div class="orders-grid" id="orders-grid">
+        <div class="loading-state">Memuat pesanan...</div>
+    </div>
+</main>
+
+<script>
+    const SUPABASE_URL = 'https://dljidtzrnavsvxppdkdb.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRsamlkdHpybmF2c3Z4cHBka2RiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxNTg5NjcsImV4cCI6MjA5NDczNDk2N30.QzqUNPeQt7tEc7hiz6l3JWV4EM2hQP0AoAfRyYQ1M30';
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const userData = JSON.parse(localStorage.getItem('resik_user') || '{}');
+    const idJasa = userData.id_jasa;
+
+    if (!idJasa) {
+        alert('Sesi tidak valid. Silakan login kembali.');
+        window.location.href = 'login_register.html';
+    }
+
+    document.getElementById('sidebar-nama').textContent = userData.nama || 'Mitra';
+
+    document.getElementById('btn-logout').addEventListener('click', () => {
+        localStorage.removeItem('resik_user');
+        window.location.href = 'login_register.html';
+    });
+
+    function formatTanggal(tgl) {
+        if (!tgl) return '-';
+        const d = new Date(tgl);
+        const today = new Date();
+        const tomorrow = new Date();
+        tomorrow.setDate(today.getDate() + 1);
+        const jam = d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+        if (d.toDateString() === today.toDateString()) return `Hari ini • ${jam} WIB`;
+        if (d.toDateString() === tomorrow.toDateString()) return `Besok • ${jam} WIB`;
+        return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'long' }) + ` • ${jam} WIB`;
+    }
+
+    function formatHarga(harga) {
+        return 'Rp ' + Number(harga).toLocaleString('id-ID');
+    }
+
+    function renderKartu(p) {
+        return `
+        <div class="order-card" id="card-${p.id_pesanan}">
+            <div class="card-header">
+                <div class="badge-group">
+                    <span class="badge badge-primary">${p.jenis_pesanan || '-'}</span>
+                    <span class="badge badge-secondary">${p.tipe || '-'}</span>
+                </div>
+                <div class="revenue-info">
+                    <span class="revenue-label">Estimasi Pendapatan</span>
+                    <span class="revenue-amount">${formatHarga(p.harga)}</span>
+                </div>
+            </div>
+
+            <div class="order-id">ID Pesanan #${p.id_pesanan}</div>
+            <div class="service-name">${p.jenis_pesanan || '-'}</div>
+
+            <div class="order-details-list">
+                <div class="detail-item">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    <span>${formatTanggal(p.tgl_pesan)}</span>
+                </div>
+                <div class="detail-item">
+                    <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                    <span>Status: <strong>${p.status}</strong></span>
+                </div>
+            </div>
+
+            <button class="btn-selesai" onclick="tandaiSelesai(${p.id_pesanan}, this)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Tandai Selesai
+            </button>
+        </div>`;
+    }
+
+    async function loadPesanan() {
+        const grid = document.getElementById('orders-grid');
+        try {
+            const { data, error } = await supabaseClient
+                .from('pesanan')
+                .select('*')
+                .eq('id_layanan', idJasa)
+                .eq('status', 'diterima')
+                .order('tgl_pesan', { ascending: true });
+
+            if (error) throw error;
+
+            if (!data || data.length === 0) {
+                grid.innerHTML = `<div class="empty-state">Tidak ada pesanan yang sedang berjalan.</div>`;
+                return;
+            }
+
+            grid.innerHTML = data.map(renderKartu).join('');
+        } catch (err) {
+            console.error(err);
+            grid.innerHTML = `<div class="empty-state">Gagal memuat pesanan. Coba refresh halaman.</div>`;
+        }
+    }
+
+    async function tandaiSelesai(idPesanan, btn) {
+        const card = document.getElementById(`card-${idPesanan}`);
+        card.querySelectorAll('button').forEach(b => b.disabled = true);
+
+        try {
+            const { error } = await supabaseClient
+                .from('pesanan')
+                .update({ status: 'selesai' })
+                .eq('id_pesanan', idPesanan);
+
+            if (error) throw error;
+
+            card.style.transition = 'opacity 0.3s ease';
+            card.style.opacity = '0';
+            setTimeout(() => {
+                card.remove();
+                const grid = document.getElementById('orders-grid');
+                if (grid.children.length === 0) {
+                    grid.innerHTML = `<div class="empty-state">Tidak ada pesanan yang sedang berjalan.</div>`;
+                }
+            }, 300);
+        } catch (err) {
+            console.error(err);
+            alert('Gagal update status. Coba lagi.');
+            card.querySelectorAll('button').forEach(b => b.disabled = false);
+        }
+    }
+
+    loadPesanan();
+</script>
+</body>
+</html>

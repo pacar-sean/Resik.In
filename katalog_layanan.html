@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resik.in - Pilih Layanan Kebersihan</title>
+    <style>
+        /* ========================================================
+           1. VARIABEL & RESET DASAR (WAJIB SESUAI PANDUAN)
+           ======================================================== */
+        :root {
+            /* Variabel Aset Eksternal (Sesuai Instruksi) */
+            --foto-profil: url('avatar.svg');
+            --logo-brand: url('logo.svg');
+            
+            /* Palet Warna Identitas Brand */
+            --primary: #0056D6;
+            --primary-hover: #0046b0;
+            --bg-page: #F8FAFC;
+            --bg-light-blue: #E8F2FF;
+            --bg-footer: #DCE5F5;
+            --text-dark: #1D2939;
+            --text-gray: #475467;
+            --text-light-gray: #667085;
+            --border-color: #EAECF0;
+            --white: #FFFFFF;
+            --gold: #F59E0B;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+        }
+
+        body {
+            display: flex;
+            height: 100vh;
+            background-color: var(--bg-page);
+            color: var(--text-dark);
+            overflow: hidden;
+        }
+
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+        button { cursor: pointer; border: none; outline: none; font-family: inherit; transition: all 0.2s ease; }
+
+        /* ========================================================
+           2. LAYOUT UTAMA (KIRI - KANAN)
+           ======================================================== */
+        .sidebar {
+            width: 260px;
+            background-color: var(--white);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 24px;
+            flex-shrink: 0;
+            z-index: 10;
+        }
+
+        .main-wrapper {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .main-content {
+            padding: 40px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* ========================================================
+           3. SIDEBAR (KIRI)
+           ======================================================== */
+        .brand {
+            display: flex;
+            align-items: center;
+            margin-bottom: 40px;
+            padding-left: 12px;
+        }
+
+        /* Implementasi Wajib: Memanggil variabel Logo Brand */
+        .brand-logo-img {
+            width: 300px;
+            height: 80px;
+            background-image: var(--logo-brand);
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: left center;
+            /* Fallback jika logo.svg belum ada di folder, teks akan muncul */
+            color: var(--primary);
+            font-size: 24px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex-grow: 1;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            color: var(--text-gray);
+            font-weight: 500;
+            font-size: 15px;
+        }
+
+        .nav-link:hover {
+            background-color: var(--bg-page);
+            color: var(--text-dark);
+        }
+
+        .nav-link svg {
+            width: 20px;
+            height: 20px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        /* Status Aktif Sidebar: Layanan (Biru Pekat, Teks Putih) */
+        .nav-link.active {
+            background-color: var(--primary);
+            color: var(--white);
+            font-weight: 600;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            background-color: var(--bg-page);
+            border-radius: 12px;
+            margin-top: auto;
+        }
+
+        /* Implementasi Wajib: Memanggil variabel Foto Profil */
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-image: var(--foto-profil);
+            background-size: cover;
+            background-position: center;
+            background-color: #D1E0FF; /* Warna fallback jika SVG tidak meload */
+        }
+
+        .user-info { display: flex; flex-direction: column; gap: 4px; }
+        .user-name { font-size: 14px; font-weight: 600; color: var(--text-dark); }
+        .user-badge {
+            background-color: var(--gold);
+            color: var(--text-dark);
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* ========================================================
+           4. HEADER & FILTER KONTEN (TENGAH)
+           ======================================================== */
+        .page-header {
+            margin-bottom: 24px;
+        }
+
+        .header-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text-dark);
+        }
+
+        .header-desc {
+            color: var(--text-gray);
+            font-size: 15px;
+            line-height: 1.5;
+            max-width: 700px;
+        }
+
+        /* Filter Tabs */
+        .filter-tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+
+        .tab-btn {
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            background-color: var(--bg-light-blue);
+            color: var(--text-dark);
+        }
+
+        .tab-btn.active {
+            background-color: var(--primary);
+            color: var(--white);
+        }
+
+        .tab-btn:hover:not(.active) {
+            background-color: #D1E0FF;
+        }
+
+        /* Bar Lokasi */
+        .location-bar {
+            background-color: #F8FAFC;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .loc-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .loc-icon {
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+        }
+
+        .loc-text {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .loc-label { font-size: 12px; color: var(--text-light-gray); }
+        .loc-value { font-size: 15px; font-weight: 600; color: var(--text-dark); }
+        .loc-change { color: var(--primary); font-size: 14px; font-weight: 600; }
+        .loc-change:hover { text-decoration: underline; }
+
+        /* Judul Section (Layanan Kos) */
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-dark);
+            white-space: nowrap;
+        }
+
+        .section-line {
+            flex-grow: 1;
+            height: 1px;
+            background-color: var(--border-color);
+        }
+
+        /* ========================================================
+           5. KARTU LAYANAN (GRID)
+           ======================================================== */
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .service-card {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .service-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.06);
+        }
+
+        /* Kartu Khusus Terpopuler (Kombo) */
+        .card-featured {
+            border: 2px solid #8AB4F8; /* Sesuai warna border biru muda di gambar */
+            background-color: var(--bg-page);
+        }
+
+        /* Area Gambar */
+        .card-img-wrapper {
+            position: relative;
+            height: 180px;
+            width: 100%;
+        }
+
+        .card-img-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .card-img-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0) 50%);
+        }
+
+        /* Badge Kategori & Populer di atas gambar */
+        .badge-category {
+            position: absolute;
+            bottom: 12px;
+            left: 12px;
+            background-color: var(--white);
+            color: var(--primary);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            z-index: 2;
+        }
+
+        .badge-popular {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background-color: var(--gold);
+            color: var(--text-dark);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            z-index: 2;
+        }
+
+        /* Konten Kartu */
+        .card-content {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .card-content h3 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-dark);
+        }
+
+        .card-content p {
+            font-size: 14px;
+            color: var(--text-gray);
+            margin-bottom: 24px;
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;          
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* Kotak Harga */
+        .pricing-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 24px;
+            flex-grow: 1;
+        }
+
+        .pricing-box {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background-color: var(--bg-page);
+        }
+
+        /* Kotak Harga Deep Cleaning di Kartu Featured (Kombo) */
+        .pricing-box.box-featured {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .price-info { display: flex; flex-direction: column; gap: 4px; }
+        
+        .price-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .pricing-box.box-featured .price-title { color: var(--white); }
+
+        .price-desc { font-size: 11px; color: var(--text-light-gray); }
+        .pricing-box.box-featured .price-desc { color: rgba(255,255,255,0.8); }
+
+        .price-value-container { text-align: right; }
+        
+        .price-value {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .pricing-box.box-featured .price-value { color: var(--white); }
+
+        .price-strike {
+            font-size: 11px;
+            color: var(--text-light-gray);
+            text-decoration: line-through;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        /* Tombol Pilih Paket */
+        .btn-select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            background-color: var(--bg-light-blue);
+            color: var(--primary);
+        }
+
+        .btn-select:hover { background-color: #D1E0FF; }
+
+        .btn-select.btn-featured {
+            background-color: var(--primary);
+            color: var(--white);
+        }
+
+        .btn-select.btn-featured:hover { background-color: var(--primary-hover); }
+
+        .btn-select svg { stroke-width: 2.5; }
+
+        /* ========================================================
+           6. FOOTER
+           ======================================================== */
+        footer {
+            background-color: var(--bg-footer);
+            padding: 48px 40px 32px 40px;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            max-width: 1200px;
+            margin: 0 auto;
+            gap: 40px;
+        }
+
+        .footer-left { max-width: 300px; }
+        
+        .footer-logo {
+            margin-bottom: 16px;
+        }
+
+        .footer-desc { color: var(--text-gray); font-size: 14px; line-height: 1.6; }
+
+        .footer-links { display: flex; gap: 60px; }
+        .link-group h4 { font-size: 14px; color: var(--primary); margin-bottom: 16px; font-weight: 600; }
+        .link-group ul { display: flex; flex-direction: column; gap: 12px; }
+        .link-group a { color: var(--text-gray); font-size: 14px; transition: color 0.2s; }
+        .link-group a:hover { color: var(--primary); }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-gray);
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .footer-bottom {
+            max-width: 1200px;
+            margin: 40px auto 0 auto;
+            padding-top: 24px;
+            border-top: 1px solid rgba(0,0,0,0.05);
+            text-align: center;
+            color: var(--text-light-gray);
+            font-size: 13px;
+        }
+
+        @media (max-width: 1024px) {
+            .service-grid { grid-template-columns: 1fr; }
+            .footer-content { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR KIRI -->
+    <aside class="sidebar">
+        <!-- Area Logo (Memanggil var(--logo-brand)) -->
+        <div class="brand">
+            <div class="brand-logo-img">
+                <!-- Teks fallback disembunyikan secara visual namun ada untuk aksesibilitas jika CSS/image gagal -->
+                <span style="opacity: 0; pointer-events: none;">Resik.in</span>
+            </div>
+        </div>
+
+        <!-- Menu Navigasi -->
+        <nav class="nav-menu">
+            <a href="dashboard.html" class="nav-link">
+                <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                Dashboard
+            </a>
+            <!-- Layanan Aktif Sesuai Screenshot -->
+            <a href="katalog_layanan.html" class="nav-link">
+                <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+                Layanan
+            </a>
+            <a href="lacak_pesanan.html" class="nav-link">
+                <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                Pesanan Saya
+            </a>
+            <a href="membership.html" class="nav-link">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>
+                Membership
+            </a>
+            <a href="chat_pelanggan.html" class="nav-link">
+                <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                Chat
+            </a>
+            <a href="edit_profil_pelanggan.html" class="nav-link">
+                <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                Profil
+            </a>
+            <a href="laporan_saran.html" class="nav-link">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                Laporan & Saran
+            </a>
+        </nav>
+
+        <!-- Profil Pengguna Bawah (Memanggil var(--foto-profil)) -->
+        <div class="user-profile">
+            <div class="user-avatar"></div>
+            <div class="user-info">
+                <div class="user-name">Budi Santoso</div>
+                <div class="user-badge">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                    MEMBER VVIP
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- WRAPPER KONTEN UTAMA -->
+    <div class="main-wrapper">
+        <main class="main-content">
+            
+            <!-- Header Halaman -->
+            <header class="page-header">
+                <h1 class="header-title">Pilih Layanan Kebersihan</h1>
+                <p class="header-desc">Pilih paket yang sesuai dengan kebutuhan ruangan Anda. Tim profesional kami siap memberikan kebersihan tanpa kompromi.</p>
+            </header>
+
+            <!-- Filter Kategori Layanan -->
+            <div class="filter-tabs">
+                <button class="tab-btn active">Semua</button>
+                <button class="tab-btn">Kos</button>
+                <button class="tab-btn">Kontrakan</button>
+                <button class="tab-btn">Rumah</button>
+            </div>
+
+            <!-- Bar Info Lokasi -->
+            <div class="location-bar">
+                <div class="loc-left">
+                    <div class="loc-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                    </div>
+                    <div class="loc-text">
+                        <span class="loc-label">Lokasi Saat Ini</span>
+                        <span class="loc-value">Jl. Melati No. 5 (Kos Hijau)</span>
+                    </div>
+                </div>
+                <a href="#" class="loc-change">Ubah</a>
+            </div>
+
+            <!-- Bagian: Layanan Kos -->
+            <div class="section-header">
+                <h2 class="section-title">Layanan Kos</h2>
+                <div class="section-line"></div>
+            </div>
+
+            <!-- Grid Kartu Layanan -->
+            <div class="service-grid">
+                
+                <!-- KARTU 1: Kamar Kos -->
+                <div class="service-card">
+                    <div class="card-img-wrapper">
+                        <!-- Menggunakan Unsplash URL sebagai placeholder representatif -->
+                        <img src="https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&w=600&q=80" alt="Kamar Kos">
+                        <div class="card-img-overlay"></div>
+                        <div class="badge-category">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+                            Kamar
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <h3>Pembersihan Kamar Kos</h3>
+                        <p>Pembersihan menyeluruh untuk kamar kos, termasuk sapu, pel, dan debu permukaan ringan.</p>
+                        
+                        <div class="pricing-options">
+                            <div class="pricing-box">
+                                <div class="price-info">
+                                    <div class="price-title">Standar</div>
+                                    <div class="price-desc">1 Jam</div>
+                                </div>
+                                <div class="price-value-container">
+                                    <div class="price-value">Rp 50.000</div>
+                                </div>
+                            </div>
+                            <div class="pricing-box">
+                                <div class="price-info">
+                                    <div class="price-title">
+                                        Deep Cleaning
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="#F59E0B" stroke="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                                    </div>
+                                    <div class="price-desc">2 Jam • Anti Tungau</div>
+                                </div>
+                                <div class="price-value-container">
+                                    <div class="price-value">Rp 120.000</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button class="btn-select">
+                            Pilih Paket 
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 12h14M12 5l7 7-7 7"></path></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- KARTU 2: Kamar Mandi -->
+                <div class="service-card">
+                    <div class="card-img-wrapper">
+                        <img src="https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?auto=format&fit=crop&w=600&q=80" alt="Kamar Mandi">
+                        <div class="card-img-overlay"></div>
+                        <div class="badge-category">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M2 12h20M7 12v5M17 12v5M4 17h16M12 2v10"></path></svg>
+                            Kamar Mandi
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <h3>Pembersihan Kamar Mandi</h3>
+                        <p>Sikat lantai, dinding, kloset, dan wastafel hingga bebas kerak untuk kenyamanan ekstra.</p>
+                        
+                        <div class="pricing-options">
+                            <div class="pricing-box">
+                                <div class="price-info">
+                                    <div class="price-title">Standar</div>
+                                    <div class="price-desc">45 Menit</div>
+                                </div>
+                                <div class="price-value-container">
+                                    <div class="price-value">Rp 45.000</div>
+                                </div>
+                            </div>
+                            <div class="pricing-box">
+                                <div class="price-info">
+                                    <div class="price-title">
+                                        Deep Cleaning
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="#F59E0B" stroke="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                                    </div>
+                                    <div class="price-desc">1.5 Jam • Anti Kerak</div>
+                                </div>
+                                <div class="price-value-container">
+                                    <div class="price-value">Rp 90.000</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button class="btn-select">
+                            Pilih Paket 
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 12h14M12 5l7 7-7 7"></path></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- KARTU 3: KOMBO (FEATURED) -->
+                <div class="service-card card-featured">
+                    <div class="card-img-wrapper">
+                        <img src="https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=600&q=80" alt="Kombo">
+                        <div class="card-img-overlay"></div>
+                        <div class="badge-category">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
+                            Kombo
+                        </div>
+                        <div class="badge-popular">Terpopuler</div>
+                    </div>
+                    <div class="card-content">
+                        <h3>Kombo Kamar + K. Mandi</h3>
+                        <p>Paket hemat untuk pembersihan menyeluruh kamar tidur dan kamar mandi dalam.</p>
+                        
+                        <div class="pricing-options">
+                            <!-- Box Standar (Diskon Core coret) -->
+                            <div class="pricing-box">
+                                <div class="price-info">
+                                    <div class="price-title">Standar</div>
+                                    <div class="price-desc">1.5 Jam</div>
+                                </div>
+                                <div class="price-value-container">
+                                    <span class="price-strike">Rp 95.000</span>
+                                    <div class="price-value">Rp 80.000</div>
+                                </div>
+                            </div>
+                            <!-- Box Deep Cleaning Spesial (Solid Biru) -->
+                            <div class="pricing-box box-featured">
+                                <div class="price-info">
+                                    <div class="price-title">
+                                        Deep Cleaning
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="#F59E0B" stroke="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                                    </div>
+                                    <div class="price-desc">3 Jam • Full Treatment</div>
+                                </div>
+                                <div class="price-value-container">
+                                    <span class="price-strike">Rp 210.000</span>
+                                    <div class="price-value">Rp 180.000</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button class="btn-select btn-featured">
+                            Pilih Paket 
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 12h14M12 5l7 7-7 7"></path></svg>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- FOOTER BAWAH -->
+            <footer>
+                <div class="footer-content">
+                    <div class="footer-left">
+                        <!-- Area Logo Footer (Memanggil var(--logo-brand)) -->
+                        <div class="footer-logo">
+                            <div class="brand-logo-img">
+                                <span style="opacity: 0; pointer-events: none;">Resik.in</span>
+                            </div>
+                        </div>
+                        <p class="footer-desc">Solusi kebersihan modern untuk hunian dan bisnis Anda di Indonesia.</p>
+                    </div>
+                    
+                    <div class="footer-links">
+                        <div class="link-group">
+                            <h4>Perusahaan</h4>
+                            <ul>
+                                <li><a href="#">Tentang Kami</a></li>
+                                <li><a href="#">Karir</a></li>
+                                <li><a href="#">Blog</a></li>
+                            </ul>
+                        </div>
+                        <div class="link-group">
+                            <h4>Bantuan</h4>
+                            <ul>
+                                <li><a href="#">Bantuan</a></li>
+                                <li><a href="#">Syarat & Ketentuan</a></li>
+                                <li><a href="#">Kebijakan Privasi</a></li>
+                            </ul>
+                        </div>
+                        <div class="link-group">
+                            <h4>Hubungi Kami</h4>
+                            <ul>
+                                <li class="contact-item">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path></svg>
+                                    halo@resik.in
+                                </li>
+                                <li class="contact-item">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                                    +62 812 3456 7890
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    &copy; 2024 Resik.in. Kebersihan Tanpa Kompromi.
+                </div>
+            </footer>
+
+        </main>
+    </div>
+<!-- Supabase CDN -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+    // ── INIT SUPABASE ──
+    const { createClient } = supabase;
+    const _supabase = createClient(
+        'https://dljidtzrnavsvxppdkdb.supabase.co',
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRsamlkdHpybmF2c3Z4cHBka2RiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxNTg5NjcsImV4cCI6MjA5NDczNDk2N30.QzqUNPeQt7tEc7hiz6l3JWV4EM2hQP0AoAfRyYQ1M30'
+    );
+
+    // ── CEK LOGIN ──
+    const userData = JSON.parse(localStorage.getItem('resik_user'));
+    if (!userData) window.location.href = 'login_register.html';
+
+    // ── TAMPIL NAMA USER ──
+    document.querySelector('.user-name').textContent = userData.nama;
+
+    // ── NAVIGASI SIDEBAR ──
+    document.querySelector('a[href="#"]:nth-child(1)').href = 'dashboard.html';
+    const navLinks = document.querySelectorAll('.nav-link');
+    navLinks[0].href = 'dashboard.html';
+    navLinks[1].href = 'katalog_layanan.html';
+    navLinks[2].href = 'lacak_pesanan.html';
+    navLinks[3].href = 'membership.html';
+    navLinks[4].href = 'chat_pelanggan.html';
+    navLinks[5].href = 'profil.html';
+
+    // ── LOAD LAYANAN DARI SUPABASE ──
+    let semuaLayanan = [];
+    let filterAktif = 'Semua';
+
+    async function loadLayanan() {
+        const { data, error } = await _supabase
+            .from('layanan')
+            .select('*');
+
+        if (error) {
+            console.error('Gagal load layanan:', error);
+            return;
+        }
+
+        semuaLayanan = data;
+        renderLayanan(data);
+        buildFilterTabs(data);
+    }
+
+    // ── BUILD FILTER TABS DARI KATEGORI SUPABASE ──
+    function buildFilterTabs(data) {
+        const kategoriSet = ['Semua', ...new Set(data.map(l => l.kategori).filter(Boolean))];
+        const tabContainer = document.querySelector('.filter-tabs');
+        tabContainer.innerHTML = '';
+
+        kategoriSet.forEach(kat => {
+            const btn = document.createElement('button');
+            btn.className = 'tab-btn' + (kat === 'Semua' ? ' active' : '');
+            btn.textContent = kat;
+            btn.onclick = () => {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                filterAktif = kat;
+                const filtered = kat === 'Semua' ? semuaLayanan : semuaLayanan.filter(l => l.kategori === kat);
+                renderLayanan(filtered);
+            };
+            tabContainer.appendChild(btn);
+        });
+    }
+
+    // ── RENDER KARTU LAYANAN ──
+    function renderLayanan(data) {
+        const grid = document.querySelector('.service-grid');
+        grid.innerHTML = '';
+
+        if (data.length === 0) {
+            grid.innerHTML = '<p style="color:var(--text-gray);grid-column:1/-1;text-align:center;padding:40px">Belum ada layanan tersedia.</p>';
+            return;
+        }
+
+        data.forEach((layanan, index) => {
+            const isFeatured = index === 0; // kartu pertama featured
+            const harga = Number(layanan.harga).toLocaleString('id-ID');
+            const hargaDeep = Number(layanan.harga * 2).toLocaleString('id-ID');
+
+            const card = document.createElement('div');
+            card.className = 'service-card' + (isFeatured ? ' card-featured' : '');
+            card.innerHTML = `
+                <div class="card-img-wrapper">
+                    <img src="https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=600&q=80" alt="${layanan.nama_layanan}" onerror="this.src='https://images.unsplash.com/photo-1527515545081-5db817172677?auto=format&fit=crop&w=600&q=80'">
+                    <div class="card-img-overlay"></div>
+                    <div class="badge-category">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+                        ${layanan.kategori || 'Umum'}
+                    </div>
+                    ${isFeatured ? '<div class="badge-popular">Terpopuler</div>' : ''}
+                </div>
+                <div class="card-content">
+                    <h3>${layanan.nama_layanan}</h3>
+                    <p>${layanan.deskripsi || 'Layanan kebersihan profesional.'}</p>
+                    <div class="pricing-options">
+                        <div class="pricing-box">
+                            <div class="price-info">
+                                <div class="price-title">Standar</div>
+                                <div class="price-desc">1 Jam</div>
+                            </div>
+                            <div class="price-value-container">
+                                <div class="price-value">Rp ${harga}</div>
+                            </div>
+                        </div>
+                        <div class="pricing-box ${isFeatured ? 'box-featured' : ''}">
+                            <div class="price-info">
+                                <div class="price-title">Deep Cleaning ⭐</div>
+                                <div class="price-desc">2 Jam • Premium</div>
+                            </div>
+                            <div class="price-value-container">
+                                <div class="price-value">Rp ${hargaDeep}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn-select ${isFeatured ? 'btn-featured' : ''}" onclick="pesanLayanan('${layanan.id_layanan}', '${layanan.nama_layanan}', ${layanan.harga})">
+                        Pilih Paket
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 12h14M12 5l7 7-7 7"></path></svg>
+                    </button>
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+    }
+
+    // ── PESAN LAYANAN → INSERT KE TABEL pesanan ──
+    async function pesanLayanan(id_layanan, nama, harga) {
+    window.location.href = `form_pemesanan.html?id_layanan=${id_layanan}&nama=${encodeURIComponent(nama)}&harga=${harga}`;
+}
+
+    // ── JALANKAN ──
+    loadLayanan();
+</script>
+</body>
+</html>

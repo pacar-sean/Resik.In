@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resik.in - Chat Pelanggan</title>
+    <style>
+        /* ========================================================
+           1. VARIABEL GLOBAL (WAJIB SESUAI PANDUAN)
+           ======================================================== */
+        :root {
+            /* Variabel Aset Wajib */
+            --foto-profil: url('avatar.svg');
+            --logo-brand: url('logo.svg');
+            --foto-mitra: url('mitra.svg'); 
+            
+            /* Palet Warna Identitas Brand */
+            --primary: #0056D6; 
+            --primary-hover: #0046b0;
+            --bg-page: #F8FAFC; 
+            --bg-sidebar: #FFFFFF;
+            --bg-light-blue: #E8F2FF; 
+            
+            /* Warna Chat */
+            --chat-mitra-bg: #E2E8F0; /* Abu-abu muda untuk bubble mitra */
+            --chat-user-bg: #0056D6;  /* Biru utama untuk bubble user */
+            
+            /* Warna Teks & Utilitas */
+            --text-dark: #1D2939; 
+            --text-gray: #667085;
+            --text-light-gray: #9CA3AF;
+            --border-color: #EAECF0;
+            --gold: #F59E0B;
+            --success: #10B981; /* Indikator online */
+        }
+
+        /* ========================================================
+           2. RESET & TYPOGRAPHY DASAR
+           ======================================================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+        }
+
+        body {
+            display: flex;
+            height: 100vh;
+            background-color: var(--bg-page);
+            color: var(--text-dark);
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+        button { cursor: pointer; border: none; outline: none; font-family: inherit; background: transparent; transition: all 0.2s ease; }
+        input { font-family: inherit; outline: none; }
+
+        /* ========================================================
+           3. LAYOUT UTAMA (SIDEBAR & KONTEN)
+           ======================================================== */
+        .layout-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* ========================================================
+           4. SIDEBAR KIRI
+           ======================================================== */
+        .sidebar {
+            width: 260px;
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 24px 16px;
+            flex-shrink: 0;
+            z-index: 20;
+        }
+
+        .brand {
+            margin-bottom: 40px;
+            padding-left: 12px;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Implementasi Wajib: Logo menggunakan Variabel Global */
+        .brand-logo-img {
+            width: 300px;
+            height: 80px;
+            background-image: var(--logo-brand);
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: left center;
+            color: var(--primary); /* Fallback */
+            font-size: 24px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            flex-grow: 1;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            color: var(--text-gray);
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover {
+            background-color: var(--bg-page);
+            color: var(--text-dark);
+        }
+
+        /* Menu Aktif Sidebar: Chat */
+        .nav-link.active {
+            background-color: var(--primary);
+            color: var(--bg-sidebar);
+            font-weight: 600;
+        }
+
+        .nav-link svg {
+            width: 20px;
+            height: 20px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background-color: var(--bg-page);
+            border-radius: 12px;
+            margin-top: auto;
+        }
+
+        /* Implementasi Wajib: Foto Profil User menggunakan Variabel Global */
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-image: var(--foto-profil);
+            background-size: cover;
+            background-position: center;
+            background-color: #D1E0FF; /* Fallback */
+        }
+
+        .user-info { display: flex; flex-direction: column; gap: 4px; }
+        .user-name { font-size: 13px; font-weight: 700; color: var(--text-dark); }
+        .user-badge {
+            background-color: var(--gold);
+            color: var(--text-dark);
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* ========================================================
+           5. AREA KONTEN CHAT (TENGAH)
+           ======================================================== */
+        .chat-container {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--bg-page);
+            height: 100vh;
+        }
+
+        /* Header Chat */
+        .chat-header {
+            background-color: var(--bg-page);
+            border-bottom: 1px solid var(--border-color);
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .chat-header-profile {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .mitra-avatar-wrapper {
+            position: relative;
+            width: 48px;
+            height: 48px;
+        }
+
+        /* Implementasi Wajib: Foto Profil Mitra menggunakan Variabel Global */
+        .mitra-avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background-image: var(--foto-mitra);
+            background-size: cover;
+            background-position: center;
+            background-color: #CBD5E1; /* Fallback */
+        }
+
+        .online-indicator {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 12px;
+            height: 12px;
+            background-color: var(--success);
+            border-radius: 50%;
+            border: 2px solid var(--bg-page);
+        }
+
+        .mitra-details {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .mitra-name { font-size: 16px; font-weight: 700; color: var(--text-dark); }
+        .mitra-status { font-size: 13px; color: var(--text-gray); display: flex; align-items: center; gap: 4px; }
+
+        .btn-call {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--primary);
+            border-radius: 50%;
+            transition: background 0.2s;
+        }
+
+        .btn-call:hover { background-color: var(--bg-light-blue); }
+
+        /* Area Scroll Pesan */
+        .chat-history {
+            flex-grow: 1;
+            padding: 24px 40px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* Badge Layanan */
+        .service-badge-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 8px;
+        }
+
+        .service-badge {
+            background-color: var(--bg-light-blue);
+            color: var(--text-dark);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 6px 16px;
+            border-radius: 20px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        /* Gelembung Chat Umum */
+        .message-row {
+            display: flex;
+            flex-direction: column;
+            max-width: 70%;
+        }
+
+        .message-row.mitra { align-self: flex-start; }
+        .message-row.user { align-self: flex-end; }
+
+        .bubble {
+            padding: 16px;
+            font-size: 14px;
+            line-height: 1.5;
+            position: relative;
+        }
+
+        /* Pesan Mitra */
+        .message-row.mitra .bubble {
+            background-color: var(--chat-mitra-bg);
+            color: var(--text-dark);
+            border-radius: 12px 12px 12px 0;
+        }
+
+        /* Pesan User */
+        .message-row.user .bubble {
+            background-color: var(--chat-user-bg);
+            color: var(--bg-sidebar);
+            border-radius: 12px 12px 0 12px;
+        }
+
+        .timestamp {
+            font-size: 12px;
+            color: var(--text-gray);
+            margin-top: 6px;
+        }
+
+        .message-row.user .timestamp { text-align: right; }
+
+        /* Kartu Lokasi di dalam Pesan User */
+        .location-card {
+            background-color: var(--bg-sidebar);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 12px;
+            width: 100%;
+            min-width: 280px;
+        }
+
+        .map-image {
+            width: 100%;
+            height: 120px;
+            /* Placeholder Map Menggunakan Pattern Gradient Gelap Biru */
+            background: linear-gradient(135deg, #1E3A5F 0%, #2A4365 100%);
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Simulasi Jalan di Peta */
+        .map-image::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                linear-gradient(45deg, transparent 48%, rgba(255,255,255,0.1) 48%, rgba(255,255,255,0.1) 52%, transparent 52%),
+                linear-gradient(-45deg, transparent 48%, rgba(255,255,255,0.1) 48%, rgba(255,255,255,0.1) 52%, transparent 52%);
+            background-size: 60px 60px;
+        }
+
+        /* Pin Lokasi Biru Overlay */
+        .map-pin {
+            position: relative;
+            width: 32px;
+            height: 32px;
+            background-color: #38BDF8; /* Light blue pin */
+            border-radius: 50% 50% 50% 0;
+            transform: rotate(-45deg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            z-index: 2;
+        }
+        .map-pin::after {
+            content: '';
+            width: 12px; height: 12px;
+            background-color: var(--bg-sidebar);
+            border-radius: 50%;
+        }
+
+        .location-info {
+            padding: 12px 16px;
+            color: var(--text-dark);
+        }
+
+        .location-info h4 { font-size: 13px; font-weight: 700; margin-bottom: 2px; }
+        .location-info p { font-size: 11px; color: var(--text-gray); }
+
+        /* ========================================================
+           6. AREA INPUT CHAT (FOOTER)
+           ======================================================== */
+        .chat-footer {
+            padding: 16px 40px 32px 40px;
+            background-color: var(--bg-page);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* Quick Actions (Bantuan Teks) */
+        .quick-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .action-chip {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background-color: #F1F5F9;
+            color: var(--text-dark);
+            transition: all 0.2s;
+        }
+
+        .action-chip:hover { background-color: #E2E8F0; }
+
+        .action-chip.active {
+            background-color: var(--bg-light-blue);
+            color: var(--primary);
+        }
+
+        .action-chip svg { width: 14px; height: 14px; stroke-width: 2.5; }
+
+        /* Form Input Bar */
+        .input-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .chat-input-wrapper {
+            flex-grow: 1;
+            background-color: var(--bg-sidebar);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 4px 16px;
+            display: flex;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+
+        /* Efek Focus sesuai instruksi */
+        .chat-input-wrapper:focus-within {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 86, 214, 0.1);
+        }
+
+        .chat-input {
+            flex-grow: 1;
+            border: none;
+            padding: 12px 0;
+            background: transparent;
+            font-size: 14px;
+            color: var(--text-dark);
+        }
+
+        .chat-input::placeholder { color: var(--text-light-gray); }
+
+        .btn-smile {
+            color: var(--text-gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+        }
+
+        .btn-smile:hover { color: var(--text-dark); }
+
+        .btn-send {
+            width: 48px;
+            height: 48px;
+            background-color: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+            box-shadow: var(--shadow-btn);
+        }
+
+        .btn-send:hover {
+            background-color: var(--primary-hover);
+            transform: scale(1.05);
+        }
+
+        .btn-send svg { width: 20px; height: 20px; stroke-width: 2.5; margin-right: 2px; }
+
+        /* Responsiveness */
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .chat-header, .chat-history, .chat-footer { padding-left: 20px; padding-right: 20px; }
+            .message-row { max-width: 85%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="layout-container">
+        
+        <!-- SIDEBAR KIRI -->
+        <aside class="sidebar">
+            <!-- Area Logo (Memanggil var(--logo-brand)) -->
+            <div class="brand">
+                <div class="brand-logo-img">
+                    <span style="opacity: 0; pointer-events: none;">Resik.in</span>
+                </div>
+            </div>
+
+            <nav class="nav-menu">
+                <a href="dashboard.html" class="nav-link">
+                    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                    Dashboard
+                </a>
+                <a href="katalog_layanan.html" class="nav-link">
+                    <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+                    Layanan
+                </a>
+                <a href="lacak_pesanan.html" class="nav-link">
+                    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    Pesanan Saya
+                </a>
+                <a href="membership.html" class="nav-link">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>
+                    Membership
+                </a>
+                <a href="chat_pelanggan.html" class="nav-link active">
+                    <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                    Chat
+                </a>
+                <a href="edit_profil_pelanggan.html" class="nav-link">
+                    <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    Profil
+                </a>
+                <a href="laporan_saran.html" class="nav-link">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                    Laporan & Saran
+                </a>
+            </nav>
+
+            <!-- Profil Pengguna (Memanggil var(--foto-profil)) -->
+            <div class="user-profile">
+                <div class="user-avatar"></div>
+                <div class="user-info">
+                    <div class="user-name">Budi Santoso</div>
+                    <div class="user-badge">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                        MEMBER VVIP
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- KONTEN CHAT UTAMA -->
+        <main class="chat-container">
+            
+            <!-- Header Chat -->
+            <header class="chat-header">
+                <div class="chat-header-profile">
+                    <div class="mitra-avatar-wrapper">
+                        <!-- Profil Mitra menggunakan var(--foto-mitra) -->
+                        <div class="mitra-avatar"></div>
+                        <div class="online-indicator"></div>
+                    </div>
+                    <div class="mitra-details">
+                        <span class="mitra-name">Adya Santoso</span>
+                        <span class="mitra-status">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                            Mitra Resik.in Pro
+                        </span>
+                    </div>
+                </div>
+                <button class="btn-call" aria-label="Telepon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                </button>
+            </header>
+
+            <!-- Riwayat Pesan -->
+            <div class="chat-history">
+                
+                <!-- Badge Layanan -->
+                <div class="service-badge-container">
+                    <div class="service-badge">LAYANAN DEEP CLEANING KOS</div>
+                </div>
+
+                <!-- Chat Bubble Mitra -->
+                <div class="message-row mitra">
+                    <div class="bubble">
+                        Halo Kak Budi! Saya Adya dari Resik.in. Saya sudah di jalan menuju lokasi Kos Anda untuk layanan Deep Cleaning. Estimasi tiba dalam 15 menit ya.
+                    </div>
+                    <span class="timestamp">09:30</span>
+                </div>
+
+                <!-- Chat Bubble User -->
+                <div class="message-row user">
+                    <div class="bubble">
+                        Pagi Pak Adya. Baik, ditunggu ya. Oh ya, tolong fokuskan pembersihan di area kamar mandi dan sudut balkon ya, karena sudah lama tidak ditinggali.
+                    </div>
+                    <span class="timestamp">09:32</span>
+                </div>
+
+                <!-- Chat Bubble Mitra -->
+                <div class="message-row mitra">
+                    <div class="bubble">
+                        Siap Kak, akan kami pastikan area tersebut bersih maksimal. Apakah ada kendala akses masuk atau perlu saya hubungi penjaga kosnya?
+                    </div>
+                    <span class="timestamp">09:33</span>
+                </div>
+
+                <!-- Chat Bubble User (Dengan Kartu Lokasi) -->
+                <div class="message-row user">
+                    <div class="bubble">
+                        <!-- Kartu Lokasi -->
+                        <div class="location-card">
+                            <div class="map-image">
+                                <!-- Pin Overlay -->
+                                <div class="map-pin"></div>
+                            </div>
+                            <div class="location-info">
+                                <h4>Kos Mentari Pagi</h4>
+                                <p>Jl. Sudirman No. 12, Jakarta Pusat</p>
+                            </div>
+                        </div>
+                        <!-- Teks dibawah kartu -->
+                        Ini lokasi tepatnya ya Pak. Pak Penjaga sudah saya kabari, Bapak langsung masuk saja.
+                    </div>
+                    <span class="timestamp">09:35</span>
+                </div>
+
+                <!-- Chat Bubble Mitra -->
+                <div class="message-row mitra">
+                    <div class="bubble">
+                        Terima kasih Kak Budi. Saya sudah sampai di gerbang depan sekarang. Segera saya mulai pengerjaannya ya.
+                    </div>
+                    <span class="timestamp">09:45</span>
+                </div>
+
+            </div>
+
+            <!-- Footer / Input Chat -->
+            <footer class="chat-footer">
+                
+                <!-- Quick Actions -->
+                <div class="quick-actions">
+                    <button class="action-chip active">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                        Kirim Lokasi
+                    </button>
+                    <button class="action-chip">
+                        Kirim Foto
+                    </button>
+                    <button class="action-chip">
+                        Bantuan Cs
+                    </button>
+                </div>
+
+                <!-- Text Input Row -->
+                <div class="input-row">
+                    <div class="chat-input-wrapper">
+                        <input type="text" class="chat-input" placeholder="Ketik pesan untuk Pak Adya...">
+                        <button class="btn-smile" aria-label="Emoji">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M8 14s1.5 2 4 2 4-2 4-2"></path><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line></svg>
+                        </button>
+                    </div>
+                    <button class="btn-send" aria-label="Kirim Pesan">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                    </button>
+                </div>
+            </footer>
+
+        </main>
+    </div>
+<!-- Supabase CDN -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+    const SUPABASE_URL = 'https://dljidtzrnavsvxppdkdb.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRsamlkdHpybmF2c3Z4cHBka2RiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxNTg5NjcsImV4cCI6MjA5NDczNDk2N30.QzqUNPeQt7tEc7hiz6l3JWV4EM2hQP0AoAfRyYQ1M30';
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    let currentUser = null;
+    let ID_JASA = null;
+    let ID_MITRA = null;
+    const renderedIds = new Set();
+
+    async function init() {
+        // 1. Ambil user dari localStorage
+        const userRaw = localStorage.getItem('resik_user');
+        if (!userRaw) { window.location.href = 'login_register.html'; return; }
+        currentUser = JSON.parse(userRaw);
+        document.querySelector('.user-name').textContent = currentUser.nama || 'Pengguna';
+
+        // 2. Ambil parameter dari URL
+        const params = new URLSearchParams(window.location.search);
+        ID_JASA = params.get('id_jasa') ? parseInt(params.get('id_jasa')) : null;
+        ID_MITRA = params.get('id_penerima') ? parseInt(params.get('id_penerima')) : null;
+
+        // ✅ DEBUG: tampilkan di console untuk verifikasi
+        console.log('User ID:', currentUser.id_user);
+        console.log('ID_JASA:', ID_JASA);
+        console.log('ID_MITRA:', ID_MITRA);
+
+        // 3. Jika tidak ada parameter URL, coba ambil otomatis dari tabel pesanan
+        if (!ID_JASA || !ID_MITRA) {
+            console.warn('Parameter URL kosong, mencoba ambil dari tabel pesanan...');
+            await autoDetectChat();
+        }
+
+        // 4. Load nama mitra
+        if (ID_MITRA) {
+            const { data } = await supabaseClient
+                .from('User')
+                .select('nama')
+                .eq('id_user', ID_MITRA)
+                .single();
+            if (data) {
+                document.querySelector('.mitra-name').textContent = data.nama;
+                document.querySelector('.chat-input').placeholder = `Ketik pesan untuk ${data.nama}...`;
+            }
+        }
+
+        await loadMessages();
+        subscribeRealtime();
+    }
+
+    // ✅ Auto-detect: cari pesanan aktif milik user ini untuk dapat id_jasa & id_mitra
+    async function autoDetectChat() {
+        const { data, error } = await supabaseClient
+            .from('chat')
+            .select('id_jasa, id_pengirim, id_penerima')
+            .or(`id_pengirim.eq.${currentUser.id_user},id_penerima.eq.${currentUser.id_user}`)
+            .order('timestap', { ascending: false })
+            .limit(1)
+            .single();
+
+        if (error || !data) {
+            console.warn('Tidak ada chat ditemukan untuk user ini');
+            return;
+        }
+
+        ID_JASA = data.id_jasa;
+        // Mitra adalah pihak yang BUKAN user saat ini
+        ID_MITRA = data.id_pengirim === currentUser.id_user
+            ? data.id_penerima
+            : data.id_pengirim;
+
+        console.log('Auto-detect → ID_JASA:', ID_JASA, 'ID_MITRA:', ID_MITRA);
+    }
+
+    async function loadMessages() {
+        if (!ID_JASA) {
+            console.error('ID_JASA tidak ditemukan, pesan tidak dapat dimuat');
+            return;
+        }
+
+        // ✅ Query sesuai struktur DB: filter id_jasa + percakapan dua arah
+        const { data, error } = await supabaseClient
+            .from('chat')
+            .select('*')
+            .eq('id_jasa', ID_JASA)
+            .or(
+                `and(id_pengirim.eq.${currentUser.id_user},id_penerima.eq.${ID_MITRA}),` +
+                `and(id_pengirim.eq.${ID_MITRA},id_penerima.eq.${currentUser.id_user})`
+            )
+            .order('timestap', { ascending: true });
+
+        if (error) { console.error('Gagal load pesan:', error.message); return; }
+
+        console.log('Pesan ditemukan:', data?.length || 0, data);
+
+        // Hapus bubble lama (bukan badge layanan)
+        document.querySelectorAll('.message-row').forEach(el => el.remove());
+        renderedIds.clear();
+
+        (data || []).forEach(msg => appendMessage(msg));
+        scrollToBottom();
+    }
+
+    function appendMessage(msg) {
+        if (renderedIds.has(msg.id_chat)) return;
+        renderedIds.add(msg.id_chat);
+
+        const isMe = msg.id_pengirim === currentUser.id_user;
+        const waktu = new Date(msg.timestap).toLocaleTimeString('id-ID', {
+            hour: '2-digit', minute: '2-digit'
+        });
+
+        const row = document.createElement('div');
+        row.className = `message-row ${isMe ? 'user' : 'mitra'}`;
+        row.dataset.id = msg.id_chat;
+        row.innerHTML = `
+            <div class="bubble">${escapeHtml(msg.isi_pesan)}</div>
+            <span class="timestamp">${waktu}</span>
+        `;
+
+        document.querySelector('.chat-history').appendChild(row);
+        scrollToBottom();
+    }
+
+    async function sendMessage() {
+        const input = document.querySelector('.chat-input');
+        const isi = input.value.trim();
+        if (!isi || !currentUser || !ID_JASA) return;
+
+        input.disabled = true;
+
+        const { error } = await supabaseClient.from('chat').insert([{
+            id_pengirim: currentUser.id_user,
+            id_penerima: ID_MITRA,
+            id_jasa: ID_JASA,
+            isi_pesan: isi,
+            timestap: new Date().toISOString()
+        }]);
+
+        input.disabled = false;
+        input.value = '';
+        input.focus();
+
+        if (error) {
+            console.error('Gagal kirim:', error.message);
+            alert('Gagal kirim pesan: ' + error.message);
+        }
+        // ✅ Tidak perlu append manual — realtime yang handle
+    }
+
+    function subscribeRealtime() {
+        supabaseClient
+            .channel(`chat-pelanggan-${ID_JASA}-${currentUser?.id_user}`)
+            .on('postgres_changes', {
+                event: 'INSERT',
+                schema: 'public',
+                table: 'chat',
+                filter: `id_jasa=eq.${ID_JASA}`
+            }, (payload) => {
+                const msg = payload.new;
+                const myId = currentUser?.id_user;
+
+                // Pastikan pesan relevan untuk percakapan ini
+                const relevan =
+                    (msg.id_pengirim === myId && msg.id_penerima === ID_MITRA) ||
+                    (msg.id_pengirim === ID_MITRA && msg.id_penerima === myId);
+
+                if (relevan) appendMessage(msg);
+            })
+            .subscribe((status) => console.log('Realtime:', status));
+    }
+
+    function scrollToBottom() {
+        const area = document.querySelector('.chat-history');
+        area.scrollTop = area.scrollHeight;
+    }
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.appendChild(document.createTextNode(text));
+        return div.innerHTML;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        init();
+        document.querySelector('.btn-send').addEventListener('click', sendMessage);
+        document.querySelector('.chat-input').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+        });
+    });
+</script>
+</body>
+</html>

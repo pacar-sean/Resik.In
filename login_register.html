@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resik.in - Masuk Akun</title>
+    <style>
+        /* ========================================================
+           1. VARIABEL GLOBAL (SESUAI PANDUAN KONSISTENSI)
+           ======================================================== */
+        :root {
+            --primary-color: #0056D6;
+            --accent-color: #007BFF;
+            --neutral-black: #333333;
+            --neutral-gray-dark: #666666;
+            --neutral-gray-light: #CCCCCC;
+            --white: #FFFFFF;
+            --logo-brand: url('logo.svg');
+            
+            /* Variabel Tambahan Khusus Halaman Ini */
+            --bg-body: #F8FAFC;
+            --border-color: #E5E7EB;
+            --text-muted: #9CA3AF;
+            --shadow-card: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
+            --radius-card: 24px;
+            --radius-input: 12px;
+        }
+
+        /* ========================================================
+           2. RESET & TYPOGRAPHY DASAR
+           ======================================================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--neutral-black);
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+        }
+
+        a { text-decoration: none; color: var(--primary-color); transition: all 0.2s ease; }
+        a:hover { color: var(--accent-color); }
+        button { cursor: pointer; border: none; outline: none; font-family: inherit; transition: all 0.2s ease; background: transparent; }
+        input { font-family: inherit; outline: none; border: none; background: transparent; width: 100%; }
+
+        /* ========================================================
+           3. LAYOUT SPLIT SCREEN
+           ======================================================== */
+        .split-layout {
+            display: flex;
+            min-height: 100vh;
+            width: 100%;
+        }
+
+        /* * Sisi Kiri (Hero Image) */
+.left-panel {
+    flex: 1.2;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 60px;
+    
+    /* LINK BARU YANG SUDAH DIPERBAIKI (ANTI-GAGAL) */
+    background-image: url('https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=1000&q=80') !important;
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    background-color: transparent !important;
+}
+
+/* Trik bayangan biar teks putih "Kebersihan Tanpa Kompromi" kelihatan jelas di atas gambar terang */
+.left-panel h1, 
+.left-panel p {
+    color: #ffffff !important;
+    text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.9) !important;
+    z-index: 10 !important;
+}
+        
+
+        /* Overlay Primary Color (Opasitas 75% Sesuai Instruksi) */
+        .left-panel::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: transparent !important; /* <--- Ganti jadi transparan */
+    z-index: 1;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            color: var(--white);
+            max-width: 500px;
+        }
+
+        .hero-title {
+            font-size: 40px;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 16px;
+        }
+
+        .hero-desc {
+            font-size: 18px;
+            font-weight: 400;
+            line-height: 1.6;
+            opacity: 0.9;
+        }
+
+        /* Sisi Kanan (Form Card) */
+        .right-panel {
+            flex: 1;
+            background-color: var(--bg-body);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+        }
+
+        /* ========================================================
+           4. FORM CARD KOMPONEN
+           ======================================================== */
+        .auth-card {
+            background-color: var(--white);
+            width: 100%;
+            max-width: 480px;
+            border-radius: var(--radius-card);
+            padding: 48px 40px;
+            box-shadow: var(--shadow-card);
+        }
+
+        .welcome-text {
+            text-align: center;
+            color: var(--neutral-gray-dark);
+            font-size: 15px;
+            line-height: 1.5;
+            margin-bottom: 32px;
+        }
+
+        /* Pilihan Role (Mitra / Pelanggan) */
+        .role-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--neutral-black);
+            margin-bottom: 12px;
+        }
+
+        .role-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .role-option {
+            border: 1px solid var(--neutral-gray-light);
+            border-radius: var(--radius-input);
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .role-option:hover {
+            border-color: var(--text-muted);
+        }
+
+        .role-option.active {
+            border: 2px solid var(--primary-color);
+            background-color: #F0F5FF;
+        }
+
+        .custom-radio {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--neutral-gray-light);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.2s;
+        }
+
+        .role-option.active .custom-radio {
+            border-color: var(--primary-color);
+        }
+
+        .role-option.active .custom-radio::after {
+            content: '';
+            width: 10px;
+            height: 10px;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+        }
+
+        .role-option input[type="radio"] {
+            display: none;
+        }
+
+        .role-text {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--neutral-black);
+        }
+
+        /* Form Inputs */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .input-label-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .input-label {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--neutral-black);
+        }
+
+        .forgot-link {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            border: 1px solid var(--neutral-gray-light);
+            border-radius: var(--radius-input);
+            padding: 0 16px;
+            background-color: var(--white);
+            transition: all 0.2s ease;
+        }
+
+        .input-wrapper:focus-within {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 86, 214, 0.1);
+        }
+
+        .input-icon {
+            color: var(--neutral-gray-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+        }
+
+        .input-icon svg { width: 18px; height: 18px; stroke-width: 2; }
+
+        .form-control {
+            padding: 14px 0;
+            font-size: 14px;
+            color: var(--neutral-black);
+        }
+
+        .form-control::placeholder { color: var(--text-muted); }
+
+        .toggle-password {
+            color: var(--neutral-gray-dark);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px;
+            margin-left: 8px;
+        }
+
+        .toggle-password:hover { color: var(--neutral-black); }
+
+        /* Tombol Utama */
+        .btn-primary {
+            width: 100%;
+            background-color: var(--primary-color);
+            color: var(--white);
+            padding: 16px;
+            border-radius: var(--radius-input);
+            font-size: 15px;
+            font-weight: 700;
+            margin-top: 8px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 12px rgba(0, 86, 214, 0.2);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent-color);
+            transform: translateY(-1px);
+        }
+
+        /* Separator */
+        .separator {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .separator::before, .separator::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .separator-text {
+            padding: 0 16px;
+            color: var(--neutral-gray-dark);
+            font-size: 12px;
+        }
+
+        /* Tombol Sosial */
+        .social-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .btn-social {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 12px;
+            border: 1px solid var(--neutral-gray-light);
+            border-radius: var(--radius-input);
+            background-color: var(--white);
+            color: var(--neutral-black);
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .btn-social:hover {
+            background-color: var(--bg-body);
+            border-color: var(--text-muted);
+        }
+
+        /* Footer Teks */
+        .auth-footer {
+            text-align: center;
+            font-size: 14px;
+            color: var(--neutral-gray-dark);
+        }
+
+        .auth-footer a {
+            font-weight: 700;
+        }
+
+        /* ========================================================
+           5. RESPONSIVENESS
+           ======================================================== */
+        @media (max-width: 992px) {
+            .left-panel { display: none; } /* Sembunyikan gambar pada layar kecil */
+            .right-panel { padding: 24px; }
+            .auth-card { padding: 40px 24px; border: 1px solid var(--border-color); box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+        }
+        @media (max-width: 480px) {
+            .role-selector { grid-template-columns: 1fr; gap: 12px; }
+            .social-buttons { grid-template-columns: 1fr; }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+
+    <script>
+  const { createClient } = supabase;
+  const supabaseClient = createClient(
+    "https://dljidtzrnavsvxppdkdb.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRsamlkdHpybmF2c3Z4cHBka2RiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxNTg5NjcsImV4cCI6MjA5NDczNDk2N30.QzqUNPeQt7tEc7hiz6l3JWV4EM2hQP0AoAfRyYQ1M30"
+  );
+</script>
+
+</head>
+<body>
+
+    <div class="split-layout">
+        
+        <!-- SISI KIRI: Background Image & Teks Sesuai Gambar Lampiran -->
+        <div class="left-panel">
+            <div class="hero-content">
+                <h1 class="hero-title">Kebersihan Tanpa Kompromi</h1>
+                <p class="hero-desc">Bergabunglah dengan ribuan pelanggan yang mempercayakan ruang mereka kepada profesional kami.</p>
+            </div>
+        </div>
+
+        <!-- SISI KANAN: Form Card -->
+        <div class="right-panel">
+            <div class="auth-card">
+                
+                <p class="welcome-text">Selamat datang kembali! Silakan masuk ke akun Anda.</p>
+
+                <form id="loginForm" novalidate>
+                    
+                    <!-- Role Selector (Mitra / Pelanggan) -->
+                    <span class="role-label">Masuk Sebagai:</span>
+                    <div class="role-selector">
+                        <label class="role-option" onclick="selectRole(this)">
+                            <input type="radio" name="role" value="mitra">
+                            <span class="custom-radio"></span>
+                            <span class="role-text">Mitra</span>
+                        </label>
+                        <!-- Pelanggan aktif secara default sesuai gambar -->
+                        <label class="role-option active" onclick="selectRole(this)">
+                            <input type="radio" name="role" value="pelanggan" checked>
+                            <span class="custom-radio"></span>
+                            <span class="role-text">Pelanggan</span>
+                        </label>
+                    </div>
+
+                    <!-- Input Email -->
+                    <div class="form-group">
+                        <div class="input-label-row">
+                            <label class="input-label">Email</label>
+                        </div>
+                        <div class="input-wrapper">
+                            <div class="input-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path></svg>
+                            </div>
+                            <input type="email" id="email" class="form-control" placeholder="nama@email.com" required>
+                        </div>
+                    </div>
+
+                    <!-- Input Password -->
+                    <div class="form-group">
+                        <div class="input-label-row">
+                            <label class="input-label">Password</label>
+                            <a href="#" class="forgot-link">Lupa Password?</a>
+                        </div>
+                        <div class="input-wrapper">
+                            <div class="input-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                            </div>
+                            <input type="password" id="password" class="form-control" placeholder="••••••••" required>
+                            
+                            <!-- Toggle Eye Icon -->
+                            <div class="toggle-password" id="togglePassword">
+                                <svg class="eye-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                                    <line x1="1" y1="1" x2="23" y2="23"></line>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tombol Submit -->
+                    <button type="submit" class="btn-primary">Masuk</button>
+
+                    <!-- Separator -->
+                    <div class="separator">
+                        <span class="separator-text">Atau masuk dengan</span>
+                    </div>
+
+                    <!-- Sosial Login -->
+                    <div class="social-buttons">
+                        <button type="button" class="btn-social">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                            </svg>
+                            Google
+                        </button>
+                        <button type="button" class="btn-social">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.469h3.047V7.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.469h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" fill="#1877F2"/>
+                            </svg>
+                            Facebook
+                        </button>
+                    </div>
+
+                    <!-- Footer Link -->
+                    <div class="auth-footer">
+                        Belum punya akun? <a href="#">Daftar sekarang</a>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT: TOGGLE ROLE & TOGGLE PASSWORD -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // 1. Logika Interaksi Toggle Password Visibility
+            const togglePassword = document.getElementById('togglePassword');
+            const passwordInput = document.getElementById('password');
+
+            togglePassword.addEventListener('click', function () {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                
+                if (type === 'text') {
+                    // Ikon Eye (Mata Terbuka)
+                    this.innerHTML = `<svg class="eye-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
+                } else {
+                    // Ikon Eye-Off (Mata Tercoret)
+                    this.innerHTML = `<svg class="eye-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>`;
+                }
+            });
+
+            // 2. Logika Form Submit - Login ke Supabase
+const loginForm = document.getElementById('loginForm');
+loginForm.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const btnSubmit = this.querySelector('.btn-primary');
+    btnSubmit.innerText = 'Memproses...';
+    btnSubmit.style.opacity = '0.8';
+
+    const email    = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const role     = document.querySelector('input[name="role"]:checked').value;
+
+    // Query ke Supabase ✅
+    const roleDB = role === 'mitra' ? 'penyedia jasa' : 'pelanggan';
+
+    const { data, error } = await supabaseClient
+    .from('User')
+    .select('*')
+    .eq('email', email)
+    .eq('password', password)
+    .eq('role', roleDB)
+    .single();
+
+    btnSubmit.innerText = 'Masuk';
+    btnSubmit.style.opacity = '1';
+
+    if (!error && data) {
+        localStorage.setItem('resik_user', JSON.stringify({
+    id_user: data.id_user,
+    nama: data.nama,
+    role: data.role
+}));
+
+        alert('Login berhasil! Selamat datang, ' + data.nama);
+
+        if (data.role === 'penyedia jasa') {
+    window.location.href = 'dashboard_mitra.html';
+} else {
+    window.location.href = 'dashboard.html';
+}
+    } else {
+        alert('Email, password, atau role salah!');
+    }
+});
+}); 
+
+        // 3. Logika Pilihan Role (Mitra / Pelanggan)
+        function selectRole(selectedLabel) {
+            // Hapus kelas active dari semua label
+            const labels = document.querySelectorAll('.role-option');
+            labels.forEach(label => label.classList.remove('active'));
+            
+            // Tambahkan kelas active ke label yang diklik
+            selectedLabel.classList.add('active');
+            
+            // Pastikan input radio di dalamnya terceklis
+            const radio = selectedLabel.querySelector('input[type="radio"]');
+            radio.checked = true;
+        }
+    </script>
+</body>
+</html>

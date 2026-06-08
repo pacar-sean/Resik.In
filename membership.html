@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resik.in - Perbandingan Membership</title>
+    <style>
+        /* ========================================================
+           1. VARIABEL GLOBAL (WAJIB SESUAI PANDUAN KONSISTENSI)
+           ======================================================== */
+        :root {
+            /* Variabel Aset Eksternal */
+            --foto-profil: url('avatar.svg');
+            --logo-brand: url('logo.svg');
+            
+            /* Palet Warna Identitas Brand */
+            --primary: #0056D6; /* Biru utama Resik.in */
+            --primary-light: #007BFF; /* Biru terang untuk tombol VVIP */
+            --bg-page: #F8FAFC; /* Latar halaman abu sangat muda */
+            --bg-sidebar: #F4F7FB;
+            --bg-footer: #DCE5F5;
+            --text-dark: #1D2939; /* Teks gelap */
+            --text-gray: #475467; /* Teks abu-abu deskripsi */
+            --text-light-gray: #667085;
+            --border-color: #EAECF0;
+            --white: #FFFFFF;
+            --gold: #F59E0B; /* Warna emas/kuning untuk badge & icon VVIP */
+        }
+
+        /* ========================================================
+           2. RESET DASAR & TYPOGRAPHY
+           ======================================================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+        }
+
+        body {
+            display: flex;
+            height: 100vh;
+            background-color: var(--bg-page);
+            color: var(--text-dark);
+            overflow: hidden;
+        }
+
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+        button { cursor: pointer; border: none; outline: none; font-family: inherit; transition: all 0.2s ease; }
+
+        /* ========================================================
+           3. LAYOUT UTAMA (SIDEBAR & KONTEN)
+           ======================================================== */
+        .sidebar {
+            width: 260px;
+            background-color: var(--bg-sidebar);
+            display: flex;
+            flex-direction: column;
+            padding: 24px;
+            flex-shrink: 0;
+            z-index: 10;
+        }
+
+        .main-wrapper {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            background-color: var(--bg-page);
+        }
+
+        .main-content {
+            padding: 60px 40px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* ========================================================
+           4. SIDEBAR KIRI
+           ======================================================== */
+        .brand {
+            margin-bottom: 40px;
+            padding-left: 12px;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Implementasi Logo menggunakan Variabel Global */
+        .brand-logo-img {
+            width: 300px;
+            height: 80px;
+            background-image: var(--logo-brand);
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: left center;
+            /* Fallback Teks jika file logo.svg belum ada di folder */
+            color: var(--primary);
+            font-size: 24px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex-grow: 1;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            color: var(--text-gray);
+            font-weight: 500;
+            font-size: 14px;
+            background-color: var(--white);
+            border: 1px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .nav-link:hover {
+            border-color: var(--border-color);
+        }
+
+        .nav-link svg {
+            width: 20px;
+            height: 20px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        /* Menu Aktif Sidebar: Membership */
+        .nav-link.active {
+            background-color: var(--primary);
+            color: var(--white);
+            font-weight: 600;
+            border-color: var(--primary);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 12px;
+            margin-top: auto;
+            border-top: 1px solid var(--border-color);
+        }
+
+        /* Implementasi Foto Profil menggunakan Variabel Global */
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-image: var(--foto-profil);
+            background-size: cover;
+            background-position: center;
+            background-color: #D1E0FF; /* Fallback warna */
+        }
+
+        .user-info { display: flex; flex-direction: column; gap: 4px; }
+        .user-name { font-size: 13px; font-weight: 700; color: var(--text-dark); }
+        .user-badge {
+            background-color: var(--gold);
+            color: var(--text-dark);
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* ========================================================
+           5. KONTEN UTAMA (HEADER & KARTU HARGA)
+           ======================================================== */
+        .page-header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .page-header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 12px;
+        }
+
+        .page-header p {
+            font-size: 16px;
+            color: var(--text-gray);
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.5;
+        }
+
+        /* Container Kartu */
+        .pricing-container {
+            display: flex;
+            justify-content: center;
+            align-items: stretch;
+            gap: 32px;
+            flex-wrap: wrap;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        /* Desain Umum Kartu */
+        .pricing-card {
+            flex: 1;
+            min-width: 300px;
+            border-radius: 24px;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+            transition: transform 0.3s;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-5px);
+        }
+
+        /* VIP Card (Putih) */
+        .card-vip {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+        }
+
+        /* VVIP Card (Biru - Rekomendasi) */
+        .card-vvip {
+            background-color: var(--primary);
+            color: var(--white);
+            border: 1px solid var(--primary);
+        }
+
+        /* Badge Rekomendasi VVIP */
+        .badge-rekomendasi {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background-color: var(--gold);
+            color: var(--text-dark);
+            font-size: 12px;
+            font-weight: 700;
+            padding: 8px 16px;
+            border-top-right-radius: 24px;
+            border-bottom-left-radius: 16px;
+        }
+
+        /* Konten Dalam Kartu */
+        .card-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .card-subtitle {
+            font-size: 14px;
+            line-height: 1.5;
+            min-height: 42px; /* Menjaga tinggi agar sejajar */
+        }
+        
+        .card-vip .card-subtitle { color: var(--text-gray); }
+        .card-vvip .card-subtitle { color: rgba(255, 255, 255, 0.9); }
+
+        .card-price-container {
+            margin: 24px 0;
+            display: flex;
+            align-items: baseline;
+            gap: 4px;
+        }
+
+        .card-price {
+            font-size: 36px;
+            font-weight: 800;
+        }
+
+        .card-period {
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .card-vip .card-period { color: var(--text-light-gray); }
+        .card-vvip .card-period { color: rgba(255, 255, 255, 0.8); }
+
+        .divider {
+            width: 100%;
+            height: 1px;
+            margin-bottom: 32px;
+        }
+
+        .card-vip .divider { background-color: var(--border-color); }
+        .card-vvip .divider { background-color: rgba(255, 255, 255, 0.2); }
+
+        /* Fitur List */
+        .feature-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            flex-grow: 1;
+            margin-bottom: 40px;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .feature-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .card-vip .feature-icon {
+            background-color: var(--primary);
+            color: var(--white);
+        }
+
+        .card-vvip .feature-icon {
+            background-color: var(--gold);
+            color: var(--text-dark);
+        }
+
+        .feature-icon svg {
+            width: 12px;
+            height: 12px;
+            stroke-width: 3;
+        }
+
+        /* Tombol Aksi */
+        .btn-action {
+            width: 100%;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .btn-vip {
+            background-color: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-vip:hover {
+            background-color: rgba(0, 86, 214, 0.05);
+        }
+
+        .btn-vvip {
+            background-color: var(--primary-light);
+            color: var(--white);
+            border: none;
+        }
+
+        .btn-vvip:hover {
+            background-color: #006ce0;
+        }
+
+        /* ========================================================
+           6. FOOTER
+           ======================================================== */
+        footer {
+            background-color: var(--bg-footer);
+            padding: 48px 40px 32px 40px;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            max-width: 1200px;
+            margin: 0 auto;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+
+        .footer-left { max-width: 300px; }
+        
+        .footer-logo { margin-bottom: 16px; }
+
+        .footer-desc { color: var(--text-gray); font-size: 14px; line-height: 1.6; }
+
+        .footer-links { display: flex; gap: 60px; flex-wrap: wrap; }
+        .link-group h4 { font-size: 14px; color: var(--primary); margin-bottom: 16px; font-weight: 600; }
+        .link-group ul { display: flex; flex-direction: column; gap: 12px; }
+        .link-group a { color: var(--text-gray); font-size: 14px; transition: color 0.2s; }
+        .link-group a:hover { color: var(--primary); }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-gray);
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .footer-bottom {
+            max-width: 1200px;
+            margin: 40px auto 0 auto;
+            padding-top: 24px;
+            border-top: 1px solid rgba(0,0,0,0.05);
+            text-align: center;
+            color: var(--text-light-gray);
+            font-size: 13px;
+        }
+
+        /* Responsiveness */
+        @media (max-width: 1024px) {
+            .pricing-container { flex-direction: column; align-items: center; }
+            .pricing-card { width: 100%; max-width: 500px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR KIRI -->
+    <aside class="sidebar">
+        <!-- Logo Resik.in (Memanggil var(--logo-brand)) -->
+        <div class="brand">
+            <div class="brand-logo-img">
+                <span style="opacity: 0; pointer-events: none;">Resik.in</span>
+            </div>
+        </div>
+
+        <!-- Menu Navigasi -->
+        <nav class="nav-menu">
+            <a href="dashboard.html" class="nav-link">
+                <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                Dashboard
+            </a>
+            <a href="katalog_layanan.html" class="nav-link">
+                <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+                Layanan
+            </a>
+            <a href="lacak_pesanan.html" class="nav-link">
+                <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                Pesanan Saya
+            </a>
+            <!-- Membership Aktif -->
+            <a href="membership.html" class="nav-link">
+                <svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M22 19V5c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+                Membership
+            </a>
+            <a href="chat_pelanggan.html" class="nav-link">
+                <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                Chat
+            </a>
+            <a href="edit_profil_pelanggan.html" class="nav-link">
+                <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                Profil
+            </a>
+            <a href="laporan_saran.html" class="nav-link">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                Laporan & Saran
+            </a>
+        </nav>
+
+        <!-- Profil Pengguna (Memanggil var(--foto-profil)) -->
+        <div class="user-profile">
+            <div class="user-avatar"></div>
+            <div class="user-info">
+                <div class="user-name">Budi Santoso</div>
+                <div class="user-badge">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                    MEMBER VVIP
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- WRAPPER KONTEN UTAMA -->
+    <div class="main-wrapper">
+        <main class="main-content">
+            
+            <!-- Header Halaman -->
+            <header class="page-header">
+                <h1>Pilih Langganan Anda</h1>
+                <p>Dapatkan kenyamanan ekstra dengan paket membership kami. Hemat lebih banyak, nikmati kebersihan tanpa kompromi setiap minggunya.</p>
+            </header>
+
+            <!-- Container Kartu Harga -->
+            <div class="pricing-container">
+                
+                <!-- KARTU 1: VIP (Putih) -->
+                <div class="pricing-card card-vip">
+                    <h2 class="card-title">VIP</h2>
+                    <p class="card-subtitle">Sempurna untuk perawatan rutin</p>
+                    
+                    <div class="card-price-container">
+                        <span class="card-price">Rp 155.000</span>
+                        <span class="card-period">/bln</span>
+                    </div>
+                    
+                    <div class="divider"></div>
+                    
+                    <ul class="feature-list">
+                        <li class="feature-item">
+                            <div class="feature-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            </div>
+                            <span>4x Pembersihan Standar / bulan</span>
+                        </li>
+                        <li class="feature-item">
+                            <div class="feature-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            </div>
+                            <span>Diskon 5% untuk layanan tambahan</span>
+                        </li>
+                        <li class="feature-item">
+                            <div class="feature-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            </div>
+                            <span>Layanan pelanggan standar</span>
+                        </li>
+                    </ul>
+
+                    <button class="btn-action btn-vip">Pilih VIP</button>
+                </div>
+
+                <!-- KARTU 2: VVIP (Biru Terang / Rekomendasi) -->
+                <div class="pricing-card card-vvip">
+                    <div class="badge-rekomendasi">Rekomendasi</div>
+                    
+                    <h2 class="card-title">VVIP</h2>
+                    <p class="card-subtitle">Kebersihan mendalam dengan prioritas utama</p>
+                    
+                    <div class="card-price-container">
+                        <span class="card-price">Rp 295.000</span>
+                        <span class="card-period">/bln</span>
+                    </div>
+                    
+                    <div class="divider"></div>
+                    
+                    <ul class="feature-list">
+                        <li class="feature-item">
+                            <div class="feature-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            </div>
+                            <span>4x Deep Cleaning / bulan</span>
+                        </li>
+                        <li class="feature-item">
+                            <div class="feature-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            </div>
+                            <span>Diskon 15% untuk layanan tambahan</span>
+                        </li>
+                        <li class="feature-item">
+                            <div class="feature-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            </div>
+                            <span>Prioritas pemesanan waktu</span>
+                        </li>
+                        <li class="feature-item">
+                            <div class="feature-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            </div>
+                            <span>Layanan pelanggan prioritas 24/7</span>
+                        </li>
+                    </ul>
+
+                    <button class="btn-action btn-vvip">Pilih VVIP</button>
+                </div>
+
+            </div>
+            
+        </main>
+
+        <!-- FOOTER (Sesuai Gaya Halaman Sebelumnya) -->
+        <footer>
+            <div class="footer-content">
+                <div class="footer-left">
+                    <div class="footer-logo">
+                        <div class="brand-logo-img">
+                            <span style="opacity: 0; pointer-events: none;">Resik.in</span>
+                        </div>
+                    </div>
+                    <p class="footer-desc">Solusi kebersihan modern untuk hunian dan bisnis Anda di Indonesia.</p>
+                </div>
+                
+                <div class="footer-links">
+                    <div class="link-group">
+                        <h4>Perusahaan</h4>
+                        <ul>
+                            <li><a href="#">Tentang Kami</a></li>
+                            <li><a href="#">Karir</a></li>
+                            <li><a href="#">Blog</a></li>
+                        </ul>
+                    </div>
+                    <div class="link-group">
+                        <h4>Bantuan</h4>
+                        <ul>
+                            <li><a href="#">Bantuan</a></li>
+                            <li><a href="#">Syarat & Ketentuan</a></li>
+                            <li><a href="#">Kebijakan Privasi</a></li>
+                        </ul>
+                    </div>
+                    <div class="link-group">
+                        <h4>Hubungi Kami</h4>
+                        <ul>
+                            <li class="contact-item">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path></svg>
+                                halo@resik.in
+                            </li>
+                            <li class="contact-item">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                                +62 812 3456 7890
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                &copy; 2024 Resik.in. Kebersihan Tanpa Kompromi.
+            </div>
+        </footer>
+    </div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+    const SUPABASE_URL = 'https://dljidtzrnavsvxppdkdb.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRsamlkdHpybmF2c3Z4cHBka2RiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxNTg5NjcsImV4cCI6MjA5NDczNDk2N30.QzqUNPeQt7tEc7hiz6l3JWV4EM2hQP0AoAfRyYQ1M30';
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    let currentUser = null;
+
+    // Navigasi sidebar
+    document.querySelectorAll('.nav-link')[0].href = 'dashboard.html';
+    document.querySelectorAll('.nav-link')[1].href = 'katalog_layanan.html';
+    document.querySelectorAll('.nav-link')[2].href = 'lacak_pesanan.html';
+    document.querySelectorAll('.nav-link')[3].href = 'membership.html';
+    document.querySelectorAll('.nav-link')[4].href = 'chat_pelanggan.html';
+    document.querySelectorAll('.nav-link')[5].href = 'edit_profil_pelanggan.html';
+    document.querySelectorAll('.nav-link')[6].href = 'laporan_saran.html';
+
+    async function init() {
+        const userRaw = localStorage.getItem('resik_user'); // ← DIPERBAIKI
+        if (!userRaw) {
+            window.location.href = 'login_register.html';
+            return;
+        }
+        currentUser = JSON.parse(userRaw);
+        document.querySelector('.user-name').textContent = currentUser.nama || 'Pengguna';
+        await cekMembershipAktif();
+    }
+
+    async function cekMembershipAktif() {
+        const { data, error } = await supabaseClient
+            .from('membership')
+            .select('*')
+            .eq('id_user', currentUser.id_user)
+            .single();
+
+        if (error || !data) {
+            document.querySelector('.user-badge').textContent = 'NON-MEMBER';
+            return;
+        }
+
+        const tipe = data.tipe_paket?.toUpperCase();
+        document.querySelector('.user-badge').innerHTML = `
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+            </svg>
+            MEMBER ${tipe}
+        `;
+        highlightAktif(data.tipe_paket);
+    }
+
+    function highlightAktif(tipe) {
+        const paket = tipe?.toLowerCase();
+        if (paket === 'vip') {
+            const btn = document.querySelector('.btn-vip');
+            btn.textContent = '✓ Paket Aktif';
+            btn.disabled = true;
+            btn.style.opacity = '0.6';
+            btn.style.cursor = 'default';
+        }
+        if (paket === 'vvip') {
+            const btn = document.querySelector('.btn-vvip');
+            btn.textContent = '✓ Paket Aktif';
+            btn.disabled = true;
+            btn.style.opacity = '0.7';
+            btn.style.cursor = 'default';
+        }
+    }
+
+    async function pilihPaket(tipe, harga) {
+        if (!currentUser) return;
+
+        const konfirmasi = confirm(`Aktifkan paket ${tipe.toUpperCase()} seharga Rp ${harga.toLocaleString('id-ID')}/bulan?`);
+        if (!konfirmasi) return;
+
+        const { data: existing } = await supabaseClient
+            .from('membership')
+            .select('id_membership')
+            .eq('id_user', currentUser.id_user)
+            .single();
+
+        let error;
+        if (existing) {
+            ({ error } = await supabaseClient
+                .from('membership')
+                .update({ tipe_paket: tipe, harga: harga })
+                .eq('id_user', currentUser.id_user));
+        } else {
+            ({ error } = await supabaseClient
+                .from('membership')
+                .insert([{ id_user: currentUser.id_user, tipe_paket: tipe, harga: harga }]));
+        }
+
+        if (error) {
+            alert('Gagal mengaktifkan paket: ' + error.message);
+            return;
+        }
+
+        alert(`Paket ${tipe.toUpperCase()} berhasil diaktifkan! 🎉`);
+        currentUser.tipe_paket = tipe;
+        localStorage.setItem('resik_user', JSON.stringify(currentUser)); // ← DIPERBAIKI
+        location.reload();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        init();
+        document.querySelector('.btn-vip').addEventListener('click', () => pilihPaket('vip', 155000));
+        document.querySelector('.btn-vvip').addEventListener('click', () => pilihPaket('vvip', 295000));
+    });
+</script>
+</body>
+</html>

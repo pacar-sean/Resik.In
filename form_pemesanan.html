@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resik.in - Alur Pemesanan</title>
+    <style>
+        /* ========================================================
+           1. VARIABEL GLOBAL (WAJIB SESUAI PANDUAN)
+           ======================================================== */
+        :root {
+            /* Variabel Aset Utama */
+            --foto-profil: url('avatar.svg');
+            --logo-brand: url('logo.svg');
+            
+            /* Palet Warna Identitas Brand */
+            --primary: #0056D6; 
+            --primary-hover: #0046b0;
+            --bg-page: #F8FAFC; 
+            --bg-sidebar: #FFFFFF;
+            --bg-light-blue: #E8F2FF; 
+            --text-dark: #111827; 
+            --text-gray: #4B5563;
+            --text-light-gray: #9CA3AF;
+            --border-color: #E5E7EB;
+            --white: #FFFFFF;
+            --gold: #F59E0B;
+            --bg-promo: #FEEBC8;
+        }
+
+        /* ========================================================
+           2. RESET & TYPOGRAPHY DASAR
+           ======================================================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+        }
+
+        body {
+            display: flex;
+            height: 100vh;
+            background-color: var(--bg-page);
+            color: var(--text-dark);
+            overflow: hidden;
+        }
+
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+        button { cursor: pointer; border: none; outline: none; font-family: inherit; background: transparent; transition: all 0.2s ease; }
+        input, textarea, select { font-family: inherit; outline: none; transition: border-color 0.2s ease; }
+
+        /* ========================================================
+           3. LAYOUT UTAMA (SIDEBAR KIRI & KONTEN KANAN)
+           ======================================================== */
+        .sidebar {
+            width: 260px;
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 24px;
+            flex-shrink: 0;
+            z-index: 20;
+        }
+
+        .main-wrapper {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            background-color: var(--bg-page);
+        }
+
+        .main-content {
+            padding: 32px 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* ========================================================
+           4. SIDEBAR
+           ======================================================== */
+        .brand {
+            margin-bottom: 40px;
+            padding-left: 12px;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Implementasi Wajib: Logo menggunakan Variabel Global */
+        .brand-logo-img {
+            width: 300px;
+            height: 80px;
+            background-image: var(--logo-brand);
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: left center;
+            color: var(--primary); /* Fallback */
+            font-size: 24px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex-grow: 1;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            color: var(--text-gray);
+            font-weight: 500;
+            font-size: 15px;
+        }
+
+        .nav-link:hover {
+            background-color: var(--bg-page);
+            color: var(--text-dark);
+        }
+
+        /* Menu Aktif Sidebar: Pesanan Saya (Biru pekat sesuai gambar) */
+        .nav-link.active {
+            background-color: var(--primary);
+            color: var(--white);
+            font-weight: 600;
+        }
+
+        .nav-link svg {
+            width: 20px;
+            height: 20px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            background-color: var(--bg-page);
+            border-radius: 12px;
+            margin-top: auto;
+        }
+
+        /* Implementasi Wajib: Foto Profil menggunakan Variabel Global */
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-image: var(--foto-profil);
+            background-size: cover;
+            background-position: center;
+            background-color: #D1E0FF; /* Fallback */
+        }
+
+        .user-info { display: flex; flex-direction: column; gap: 4px; }
+        .user-name { font-size: 14px; font-weight: 700; color: var(--text-dark); }
+        .user-badge {
+            background-color: var(--gold);
+            color: var(--text-dark);
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* ========================================================
+           5. HEADER & STEPPER (Atas)
+           ======================================================== */
+        .status-banner {
+            background-color: var(--bg-light-blue);
+            border-radius: 12px;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+            border: 1px solid #D1E0FF;
+        }
+
+        .status-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .status-icon {
+            width: 36px;
+            height: 36px;
+            background-color: rgba(0, 86, 214, 0.1);
+            color: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .status-text { display: flex; flex-direction: column; }
+        .status-label { font-size: 12px; color: var(--text-gray); }
+        .status-value { font-size: 15px; font-weight: 700; color: var(--text-dark); }
+        
+        .status-btn {
+            background-color: rgba(0, 86, 214, 0.1);
+            color: var(--primary);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        /* Stepper Flow */
+        .stepper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 40px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+            z-index: 2;
+            width: 120px;
+        }
+
+        .step-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: var(--border-color);
+            color: var(--text-gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .step.completed .step-circle,
+        .step.active .step-circle {
+            background-color: var(--primary);
+            color: var(--white);
+        }
+
+        .step-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-light-gray);
+            text-align: center;
+        }
+
+        .step.active .step-label,
+        .step.completed .step-label {
+            color: var(--primary);
+        }
+
+        .step-line {
+            flex-grow: 1;
+            height: 2px;
+            background-color: var(--border-color);
+            position: relative;
+            z-index: 1;
+            margin: 0 -30px;
+            top: -12px;
+        }
+
+        .step-line.active { background-color: var(--primary); }
+
+        /* ========================================================
+           6. KONTEN PEMESANAN (GRID KIRI & KANAN)
+           ======================================================== */
+        .booking-grid {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 32px;
+            align-items: start;
+        }
+
+        .card {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .card-header svg { color: var(--primary); }
+
+        /* MAP AREA */
+        .map-container {
+            width: 100%;
+            height: 200px;
+            /* Placeholder Map Visual */
+            background-image: url('https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&q=80&w=1000');
+            background-size: cover;
+            background-position: center;
+            border-radius: 12px;
+            position: relative;
+            margin-bottom: 20px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        /* Overlay pins dummy untuk estetik map */
+        .map-overlay {
+            position: absolute;
+            inset: 0;
+            background-color: rgba(0, 86, 214, 0.1);
+        }
+        
+        .map-pin {
+            position: absolute;
+            color: var(--primary);
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
+        }
+
+        .btn-use-location {
+            position: absolute;
+            bottom: 16px;
+            right: 16px;
+            background-color: var(--white);
+            color: var(--primary);
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        /* FORM INPUTS */
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; font-size: 13px; color: var(--text-gray); margin-bottom: 8px; }
+        
+        .form-control {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            color: var(--text-dark);
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 86, 214, 0.1);
+        }
+
+        textarea.form-control { resize: vertical; min-height: 80px; }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        /* Toggle Button Group (Tipe Properti) */
+        .btn-group {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .btn-toggle {
+            flex: 1;
+            padding: 14px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background-color: var(--white);
+            color: var(--text-gray);
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .btn-toggle.active {
+            background-color: var(--bg-light-blue);
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        /* CALENDAR / PILIH JADWAL */
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .cal-month { font-weight: 700; font-size: 16px; }
+        .cal-nav { display: flex; gap: 12px; }
+        .cal-nav button { padding: 4px; color: var(--text-gray); }
+        .cal-nav button:hover { color: var(--primary); }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .cal-day-name { font-size: 13px; color: var(--text-light-gray); font-weight: 500; margin-bottom: 8px; }
+        
+        .cal-date {
+            width: 36px;
+            height: 36px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+
+        .cal-date:hover:not(.disabled):not(.active) { background-color: var(--bg-light-blue); }
+        .cal-date.active { background-color: var(--primary); color: var(--white); font-weight: 700; box-shadow: 0 4px 10px rgba(0, 86, 214, 0.3); }
+        .cal-date.disabled { color: #D1D5DB; cursor: not-allowed; }
+
+        /* TIME SLOTS */
+        .time-section { margin-bottom: 24px; }
+        .time-section:last-child { margin-bottom: 0; }
+        .time-title { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; margin-bottom: 12px; color: var(--text-dark); }
+        .time-grid { display: flex; flex-wrap: wrap; gap: 12px; }
+        
+        .time-btn {
+            padding: 10px 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background-color: var(--white);
+            color: var(--text-gray);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .time-btn:hover { border-color: var(--text-light-gray); }
+        .time-btn.active {
+            background-color: var(--primary);
+            color: var(--white);
+            border-color: var(--primary);
+            box-shadow: 0 4px 10px rgba(0, 86, 214, 0.2);
+        }
+
+        /* ========================================================
+           7. KANAN: RINGKASAN PESANAN (STICKY SIDEBAR)
+           ======================================================== */
+        .summary-wrapper {
+            position: sticky;
+            top: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .summary-card {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+        }
+
+        .summary-title { font-size: 16px; font-weight: 700; margin-bottom: 20px; color: var(--text-dark); }
+
+        .service-info {
+            display: flex;
+            gap: 16px;
+            padding-bottom: 20px;
+            border-bottom: 1px dashed var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        .service-img {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            background-image: url('https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=150&q=80');
+            background-size: cover;
+            flex-shrink: 0;
+        }
+
+        .service-details h4 { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+        .service-details p { font-size: 12px; color: var(--text-gray); margin-bottom: 8px; }
+        .service-details .time-badge { font-size: 12px; font-weight: 700; color: var(--primary); }
+
+        .price-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+        .price-item { display: flex; justify-content: space-between; font-size: 13px; color: var(--text-gray); }
+        .price-item.bold { font-weight: 700; color: var(--text-dark); }
+        
+        .price-total {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-color);
+            margin-bottom: 24px;
+        }
+
+        .price-total span:first-child { font-weight: 700; font-size: 14px; }
+        .price-total span:last-child { font-weight: 800; font-size: 18px; color: var(--primary); }
+
+        /* ACTION BUTTONS */
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--primary);
+            color: var(--white);
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .btn-submit:hover { background-color: var(--primary-hover); }
+
+        .btn-draft {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--bg-light-blue);
+            color: var(--primary);
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .btn-draft:hover { background-color: #D1E0FF; }
+
+        .secure-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 12px;
+            color: var(--text-light-gray);
+        }
+
+        /* Promo Card */
+        .promo-card {
+            background-color: var(--bg-promo);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            cursor: pointer;
+            border: 1px solid #F6D6A5;
+        }
+
+        .promo-card:hover { background-color: #FEE0B2; }
+        
+        .promo-icon { color: #D97706; margin-top: 2px; }
+        
+        .promo-text { flex-grow: 1; display: flex; flex-direction: column; gap: 2px; }
+        .promo-text strong { font-size: 14px; color: #92400E; }
+        .promo-text span { font-size: 12px; color: #B45309; }
+        
+        .promo-action { font-size: 13px; font-weight: 700; color: #92400E; margin-top: 2px; }
+
+        /* Responsive Breakpoint */
+        @media (max-width: 1100px) {
+            .booking-grid { grid-template-columns: 1fr; }
+            .summary-wrapper { position: relative; top: 0; }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+   
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <!-- Area Logo (Memanggil var(--logo-brand)) -->
+        <div class="brand">
+            <div class="brand-logo-img">
+                <span style="opacity: 0; pointer-events: none;">Resik.in</span>
+            </div>
+        </div>
+
+        <nav class="nav-menu">
+            <a href="#" class="nav-link">
+                <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                Dashboard
+            </a>
+            <a href="#" class="nav-link">
+                <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+                Layanan
+            </a>
+            <!-- Nav Aktif -->
+            <a href="#" class="nav-link active">
+                <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                Pesanan Saya
+            </a>
+            <a href="#" class="nav-link">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>
+                Membership
+            </a>
+            <a href="#" class="nav-link">
+                <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                Chat
+            </a>
+            <a href="#" class="nav-link">
+                <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                Profil
+            </a>
+            <a href="#" class="nav-link">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                Laporan & Saran
+            </a>
+        </nav>
+
+        <!-- Profil Pengguna (Memanggil var(--foto-profil)) -->
+        <div class="user-profile">
+            <div class="user-avatar"></div>
+            <div class="user-info">
+                <div class="user-name">Budi Santoso</div>
+                <div class="user-badge">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                    MEMBER VVIP
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- WRAPPER KONTEN UTAMA -->
+    <div class="main-wrapper">
+        <div class="main-content">
+            
+            <!-- Banner Status Atas -->
+            <div class="status-banner">
+                <div class="status-left">
+                    <div class="status-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    </div>
+                    <div class="status-text">
+                        <span class="status-label">Status Pesanan</span>
+                        <span class="status-value">Menunggu Konfirmasi</span>
+                    </div>
+                </div>
+                <button class="status-btn">Proses Berlangsung</button>
+            </div>
+
+            <!-- Stepper / Alur (Step 2 Aktif) -->
+            <div class="stepper">
+                <div class="step completed">
+                    <div class="step-circle">1</div>
+                    <div class="step-label">Detail Pesanan</div>
+                </div>
+                <div class="step-line active"></div>
+                <div class="step active">
+                    <div class="step-circle">2</div>
+                    <div class="step-label">Alamat & Jadwal</div>
+                </div>
+                <div class="step-line"></div>
+                <div class="step">
+                    <div class="step-circle">3</div>
+                    <div class="step-label">Pembayaran</div>
+                </div>
+            </div>
+
+            <!-- Grid Pemesanan (Kiri Formulir, Kanan Ringkasan) -->
+            <div class="booking-grid">
+                
+                <!-- KOLOM KIRI: FORMULIR -->
+                <div class="form-container">
+                    
+                    <!-- KARTU 1: Alamat -->
+                    <div class="card">
+                        <div class="card-header">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                            Alamat Pembersihan
+                        </div>
+                        
+                        <div class="map-container">
+                            <div class="map-overlay"></div>
+                            <!-- Pin Maps Dummy -->
+                            <svg class="map-pin" style="top:30%; left:40%; width:32px; height:32px;" viewBox="0 0 24 24" fill="currentColor" stroke="white"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg>
+                            <svg class="map-pin" style="top:50%; left:55%; width:40px; height:40px;" viewBox="0 0 24 24" fill="currentColor" stroke="white"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg>
+                            
+                            <button class="btn-use-location">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle></svg>
+                                Gunakan Lokasi Saat Ini
+                            </button>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Detail Alamat Lengkap</label>
+                            <textarea id="alamat" class="form-control" placeholder="Masukkan nama jalan, nomor rumah/kamar, RT/RW, dan patokan..."></textarea>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Nomor Kamar/Rumah</label>
+                                <input type="text" class="form-control" placeholder="Contoh: No. 12B">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Tipe Properti</label>
+                                <!-- Interactive Toggle -->
+                                <div class="btn-group">
+                                    <button class="btn-toggle active" onclick="toggleProperty(this)">Rumah</button>
+                                    <button class="btn-toggle" onclick="toggleProperty(this)">Kontrakan</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- KARTU 2: Jadwal (Kalender & Waktu) -->
+                    <div class="card">
+                        <div class="card-header">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                            Pilih Jadwal
+                        </div>
+
+                        <div class="calendar-header">
+                            <span class="cal-month">Mei 2024</span>
+                            <div class="cal-nav">
+                                <button><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+                                <button><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+                            </div>
+                        </div>
+
+                        <!-- Calendar Grid Interactive -->
+                        <div class="calendar-grid" id="calendarGrid">
+                            <div class="cal-day-name">Sen</div><div class="cal-day-name">Sel</div><div class="cal-day-name">Rab</div><div class="cal-day-name">Kam</div><div class="cal-day-name">Jum</div><div class="cal-day-name">Sab</div><div class="cal-day-name">Min</div>
+                            <!-- Injecting dates dynamically via JS for neatness, but static layout is fine too. Let's do static as requested. -->
+                            <div class="cal-date disabled">29</div><div class="cal-date disabled">30</div>
+                            <div class="cal-date" onclick="selectDate(this)">1</div><div class="cal-date" onclick="selectDate(this)">2</div><div class="cal-date" onclick="selectDate(this)">3</div><div class="cal-date" onclick="selectDate(this)">4</div><div class="cal-date" onclick="selectDate(this)">5</div>
+                            <div class="cal-date" onclick="selectDate(this)">6</div><div class="cal-date" onclick="selectDate(this)">7</div><div class="cal-date" onclick="selectDate(this)">8</div><div class="cal-date" onclick="selectDate(this)">9</div><div class="cal-date" onclick="selectDate(this)">10</div><div class="cal-date" onclick="selectDate(this)">11</div><div class="cal-date" onclick="selectDate(this)">12</div>
+                            <div class="cal-date" onclick="selectDate(this)">13</div><div class="cal-date" onclick="selectDate(this)">14</div><div class="cal-date" onclick="selectDate(this)">15</div><div class="cal-date" onclick="selectDate(this)">16</div><div class="cal-date" onclick="selectDate(this)">17</div><div class="cal-date" onclick="selectDate(this)">18</div><div class="cal-date" onclick="selectDate(this)">19</div>
+                            <div class="cal-date disabled">20</div><div class="cal-date active" onclick="selectDate(this)">21</div><div class="cal-date" onclick="selectDate(this)">22</div><div class="cal-date" onclick="selectDate(this)">23</div><div class="cal-date" onclick="selectDate(this)">24</div><div class="cal-date" onclick="selectDate(this)">25</div><div class="cal-date" onclick="selectDate(this)">26</div>
+                            <div class="cal-date" onclick="selectDate(this)">27</div><div class="cal-date" onclick="selectDate(this)">28</div><div class="cal-date" onclick="selectDate(this)">29</div><div class="cal-date" onclick="selectDate(this)">30</div><div class="cal-date" onclick="selectDate(this)">31</div><div class="cal-date disabled">1</div><div class="cal-date disabled">2</div>
+                        </div>
+
+                        <!-- Time Slots Interactive -->
+                        <div class="time-section">
+                            <div class="time-title">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="19.78" x2="19.78" y2="18.36"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="4.22" x2="19.78" y2="5.64"></line></svg>
+                                Pagi (08:00 - 11:00)
+                            </div>
+                            <div class="time-grid">
+                                <button class="time-btn" onclick="selectTime(this)">08:00</button>
+                                <button class="time-btn" onclick="selectTime(this)">08:30</button>
+                                <button class="time-btn" onclick="selectTime(this)">09:00</button>
+                                <button class="time-btn" onclick="selectTime(this)">09:30</button>
+                                <button class="time-btn active" onclick="selectTime(this)">10:00</button>
+                                <button class="time-btn" onclick="selectTime(this)">10:30</button>
+                                <button class="time-btn" onclick="selectTime(this)">11:00</button>
+                            </div>
+                        </div>
+
+                        <div class="time-section">
+                            <div class="time-title">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="4"></circle></svg>
+                                Siang (12:00 - 15:00)
+                            </div>
+                            <div class="time-grid">
+                                <button class="time-btn" onclick="selectTime(this)">12:00</button>
+                                <button class="time-btn" onclick="selectTime(this)">12:30</button>
+                                <button class="time-btn" onclick="selectTime(this)">13:00</button>
+                                <button class="time-btn" onclick="selectTime(this)">13:30</button>
+                                <button class="time-btn" onclick="selectTime(this)">14:00</button>
+                                <button class="time-btn" onclick="selectTime(this)">14:30</button>
+                                <button class="time-btn" onclick="selectTime(this)">15:00</button>
+                            </div>
+                        </div>
+
+                        <div class="time-section">
+                            <div class="time-title">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                                Sore (16:00 - 18:00)
+                            </div>
+                            <div class="time-grid">
+                                <button class="time-btn" onclick="selectTime(this)">16:00</button>
+                                <button class="time-btn" onclick="selectTime(this)">16:30</button>
+                                <button class="time-btn" onclick="selectTime(this)">17:00</button>
+                                <button class="time-btn" onclick="selectTime(this)">17:30</button>
+                                <button class="time-btn" onclick="selectTime(this)">18:00</button>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- KARTU 3: Catatan -->
+                    <div class="card">
+                        <div class="card-header">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                            Catatan Khusus
+                        </div>
+                        <textarea class="form-control" placeholder="Contoh: 'Ada kucing ramah di rumah', 'Kunci di bawah pot', 'Mohon fokus bersihkan area balkon'..."></textarea>
+                    </div>
+
+                </div>
+
+                <!-- KOLOM KANAN: RINGKASAN PESANAN -->
+                <div class="summary-wrapper">
+                    
+                    <div class="summary-card">
+                        <h3 class="summary-title">Ringkasan Pesanan</h3>
+                        
+                        <div class="service-info">
+                            <div class="service-img"></div>
+                            <div class="service-details">
+                                <h4>Deep Cleaning Service</h4>
+                                <p>Paket Rumah Standar</p>
+                                <span class="time-badge" id="displayDateTime">21 Mei • 10:00 WIB</span>
+                            </div>
+                        </div>
+
+                        <div class="price-list">
+                            <div class="price-item">
+                                <span>Harga Layanan</span>
+                                <span class="bold">Rp 35.000</span>
+                            </div>
+                            <div class="price-item">
+                                <span>Biaya Transportasi</span>
+                                <span class="bold">Gratis</span>
+                            </div>
+                            <div class="price-item">
+                                <span>PPN (11%)</span>
+                                <span class="bold">Rp 3.850</span>
+                            </div>
+                        </div>
+
+                        <div class="price-total">
+                            <span>Total Pembayaran</span>
+                            <span id="displayTotal">Rp 38.850</span>
+                        </div>
+
+                        <button class="btn-submit" onclick="submitPesanan()">
+                            Lanjut ke Pembayaran
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                        </button>
+                        
+                        <button class="btn-draft">
+                            Simpan sebagai Draft
+                        </button>
+
+                        <div class="secure-info">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><polyline points="9 12 11 14 15 10"></polyline></svg>
+                            Pembayaran Aman & Terenkripsi
+                        </div>
+                    </div>
+
+                    <!-- Promo Card Interaktif -->
+                    <div class="promo-card" onclick="promptPromo()">
+                        <div class="promo-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
+                        </div>
+                        <div class="promo-text">
+                            <strong>Gunakan Promo?</strong>
+                            <span>Cek kupon yang tersedia</span>
+                        </div>
+                        <div class="promo-action">Pilih</div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT INTERAKTIF DASAR -->
+   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+    // ── INIT SUPABASE ──
+    const { createClient } = supabase;
+    const _supabase = createClient(
+        'https://dljidtzrnavsvxppdkdb.supabase.co',
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRsamlkdHpybmF2c3Z4cHBka2RiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxNTg5NjcsImV4cCI6MjA5NDczNDk2N30.QzqUNPeQt7tEc7hiz6l3JWV4EM2hQP0AoAfRyYQ1M30'
+    );
+
+    // ── CEK LOGIN ──
+    const userData = JSON.parse(localStorage.getItem('resik_user'));
+    if (!userData) window.location.href = 'login_register.html';
+
+    // ── TAMPIL NAMA USER ──
+    document.querySelector('.user-name').textContent = userData.nama;
+
+    // ── NAVIGASI SIDEBAR ──
+    const navLinks = document.querySelectorAll('.nav-link');
+    navLinks[0].href = 'dashboard.html';
+    navLinks[1].href = 'layanan.html';
+    navLinks[2].href = 'lacak_pesanan.html';
+    navLinks[3].href = 'membership.html';
+    navLinks[4].href = 'chat_pelanggan.html';
+    navLinks[5].href = 'profil.html';
+
+    // ── AMBIL DATA LAYANAN DARI URL PARAMS ──
+    const params = new URLSearchParams(window.location.search);
+    const idLayanan = params.get('id_layanan') || null;
+    const namaLayanan = params.get('nama') || 'Deep Cleaning Service';
+    const hargaLayanan = parseInt(params.get('harga')) || 35000;
+    const ppn = Math.round(hargaLayanan * 0.11);
+    const total = hargaLayanan + ppn;
+
+    // Tampilkan di ringkasan
+    document.querySelector('.service-details h4').textContent = namaLayanan;
+    document.querySelector('.price-list .price-item:nth-child(1) span:last-child').textContent = 
+        'Rp ' + hargaLayanan.toLocaleString('id-ID');
+    document.querySelector('.price-list .price-item:nth-child(3) span:last-child').textContent = 
+        'Rp ' + ppn.toLocaleString('id-ID');
+    document.getElementById('displayTotal').textContent = 'Rp ' + total.toLocaleString('id-ID');
+
+    // ── TOGGLE, DATE, TIME (pindah dari module ke global) ──
+    function toggleProperty(element) {
+        element.parentElement.querySelectorAll('.btn-toggle').forEach(b => b.classList.remove('active'));
+        element.classList.add('active');
+    }
+
+    function selectDate(element) {
+        if (element.classList.contains('disabled')) return;
+        document.querySelectorAll('.cal-date').forEach(d => d.classList.remove('active'));
+        element.classList.add('active');
+        updateSummaryDateTime();
+    }
+
+    function selectTime(element) {
+        document.querySelectorAll('.time-btn').forEach(t => t.classList.remove('active'));
+        element.classList.add('active');
+        updateSummaryDateTime();
+    }
+
+    function updateSummaryDateTime() {
+        const activeDate = document.querySelector('.cal-date.active');
+        const activeTime = document.querySelector('.time-btn.active');
+        if (activeDate && activeTime) {
+            document.getElementById('displayDateTime').innerText = 
+                `${activeDate.innerText} • ${activeTime.innerText} WIB`;
+        }
+    }
+
+    function promptPromo() {
+        const kode = prompt('Masukkan Kode Promo:', '');
+        if (kode) alert("Kode '" + kode + "' diterapkan!");
+    }
+
+    // ── SUBMIT PESANAN KE SUPABASE ──
+    async function submitPesanan() {
+        const alamat = document.getElementById('alamat').value;
+        const activeDate = document.querySelector('.cal-date.active');
+        const activeTime = document.querySelector('.time-btn.active');
+        const tipeProperti = document.querySelector('.btn-toggle.active')?.innerText || 'Rumah';
+
+        if (!alamat || !activeDate || !activeTime) {
+            alert('Lengkapi alamat, tanggal, dan waktu dulu!');
+            return;
+        }
+
+        const tglPesan = new Date().toISOString();
+
+        const { error } = await _supabase.from('pesanan').insert([{
+            id_user: userData.id_user,
+            id_layanan: idLayanan,
+            tgl_pesan: tglPesan,
+            harga: total,
+            status: 'menunggu',
+            jenis_pesanan: namaLayanan,
+            tipe: tipeProperti
+        }]);
+
+        if (error) {
+            alert('Gagal buat pesanan: ' + error.message);
+        } else {
+            alert('Pesanan berhasil dibuat!');
+            window.location.href = 'lacak_pesanan.html';
+        }
+    }
+
+    // Expose ke HTML onclick
+    window.toggleProperty = toggleProperty;
+    window.selectDate = selectDate;
+    window.selectTime = selectTime;
+    window.promptPromo = promptPromo;
+    window.submitPesanan = submitPesanan;
+</script>
+</body>
+</html>

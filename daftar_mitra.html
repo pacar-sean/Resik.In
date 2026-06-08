@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resik.in - Pendaftaran Mitra Baru</title>
+    <style>
+        /* ========================================================
+           1. VARIABEL GLOBAL (WAJIB SESUAI PANDUAN)
+           ======================================================== */
+        :root {
+            /* Variabel Aset Utama */
+            --logo-brand: url('logo.svg');
+            
+            /* Palet Warna Identitas Brand */
+            --primary: #0056D6; 
+            --primary-hover: #0046b0;
+            --bg-page: #F8FAFC; 
+            --bg-white: #FFFFFF;
+            
+            /* Warna Teks & Utilitas */
+            --text-dark: #111827; 
+            --text-gray: #4B5563;
+            --text-light-gray: #9CA3AF;
+            --border-color: #E2E8F0;
+            --input-bg: #FFFFFF;
+            
+            /* Shadow & Radius */
+            --shadow-card: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+            --shadow-btn: 0 4px 12px rgba(0, 86, 214, 0.2);
+            --radius-card: 24px;
+            --radius-input: 12px;
+        }
+
+        /* ========================================================
+           2. RESET & TYPOGRAPHY DASAR
+           ======================================================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-page);
+            color: var(--text-dark);
+            -webkit-font-smoothing: antialiased;
+            line-height: 1.5;
+            min-height: 100vh;
+        }
+
+        a { text-decoration: none; color: inherit; transition: color 0.2s; }
+        button { cursor: pointer; border: none; outline: none; font-family: inherit; transition: all 0.2s ease; background: transparent; }
+        
+        /* ========================================================
+           3. LAYOUT SPLIT SCREEN
+           ======================================================== */
+        .split-layout {
+            display: flex;
+            min-height: 100vh;
+            width: 100%;
+        }
+
+        /* Sisi Kiri (Ilustrasi & Promosi) */
+        .left-panel {
+    flex: 1.2;
+    /* GANTI BARIS BACKGROUND MENGGUNAKAN LINK BARU DI BAWAH INI */
+    background-image: linear-gradient(to bottom, rgba(0, 86, 214, 0.8), rgba(0, 86, 214, 0.95)), url('https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1000&q=80');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    color: var(--bg-white);
+    display: flex;
+    flex-direction: column;
+    padding: 60px;
+    position: relative;
+    overflow: hidden;
+        }
+
+        /* Ornamen Background Kiri */
+        .left-panel::before {
+            content: '';
+            position: absolute;
+            top: -10%;
+            left: -10%;
+            width: 300px;
+            height: 300px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            filter: blur(40px);
+        }
+
+        .left-panel::after {
+            content: '';
+            position: absolute;
+            bottom: -10%;
+            right: -10%;
+            width: 400px;
+            height: 400px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            filter: blur(60px);
+        }
+
+        /* Implementasi Wajib: Logo menggunakan Variabel Global */
+        .brand-logo {
+            width: 300px;
+            height: 80px;
+            background-image: var(--logo-brand);
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: left center;
+            /* Fallback Teks */
+            color: var(--bg-white);
+            font-size: 28px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            margin-bottom: auto; /* Push content to middle */
+            z-index: 10;
+        }
+
+        .promo-content {
+            z-index: 10;
+            margin-bottom: auto;
+        }
+
+        .promo-title {
+            font-size: 40px;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 24px;
+            color: var(--bg-white);
+        }
+
+        .promo-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-top: 32px;
+        }
+
+        .promo-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        .promo-icon {
+            width: 32px;
+            height: 32px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Sisi Kanan (Form Card) */
+        .right-panel {
+            flex: 1;
+            background-color: var(--bg-page);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+        }
+
+        .form-card {
+            background-color: var(--bg-white);
+            width: 100%;
+            max-width: 480px;
+            border-radius: var(--radius-card);
+            padding: 48px 40px;
+            box-shadow: var(--shadow-card);
+        }
+
+        /* ========================================================
+           4. FORM KOMPONEN
+           ======================================================== */
+        .form-header {
+            margin-bottom: 32px;
+        }
+
+        .form-title {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+
+        .form-subtitle {
+            font-size: 14px;
+            color: var(--text-gray);
+            line-height: 1.5;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .input-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Icon di dalam input */
+        .input-icon {
+            position: absolute;
+            left: 16px;
+            color: var(--text-light-gray);
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .input-icon svg { width: 18px; height: 18px; stroke-width: 2; }
+
+        /* Styling Input Dasar */
+        .form-control {
+            width: 100%;
+            padding: 14px 16px 14px 44px; /* padding-left besar untuk ikon */
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-input);
+            background-color: var(--input-bg);
+            font-size: 14px;
+            color: var(--text-dark);
+            transition: all 0.2s ease;
+            outline: none;
+        }
+
+        .form-control::placeholder { color: #9CA3AF; }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 86, 214, 0.1);
+        }
+
+        /* Dropdown Kota Custom */
+        select.form-control {
+            appearance: none;
+            cursor: pointer;
+            padding-right: 40px; /* Ruang untuk arrow */
+        }
+        
+        .select-arrow {
+            position: absolute;
+            right: 16px;
+            color: var(--text-light-gray);
+            pointer-events: none;
+        }
+
+        /* Toggle Password Eye */
+        .toggle-password {
+            position: absolute;
+            right: 16px;
+            color: var(--text-light-gray);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px;
+        }
+
+        .toggle-password:hover { color: var(--text-dark); }
+
+        /* Checkbox Persetujuan */
+        .checkbox-group {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-top: 8px;
+            margin-bottom: 32px;
+            cursor: pointer;
+        }
+
+        .custom-checkbox {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            outline: none;
+            cursor: pointer;
+            position: relative;
+            flex-shrink: 0;
+            margin-top: 2px;
+            transition: all 0.2s;
+        }
+
+        .custom-checkbox:checked {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .custom-checkbox:checked::after {
+            content: '';
+            position: absolute;
+            left: 6px;
+            top: 2px;
+            width: 5px;
+            height: 10px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
+        .checkbox-label {
+            font-size: 13px;
+            color: var(--text-gray);
+            line-height: 1.5;
+            user-select: none;
+        }
+
+        .checkbox-label a {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .checkbox-label a:hover { text-decoration: underline; }
+
+        /* Tombol Aksi */
+        .btn-primary {
+            width: 100%;
+            background-color: var(--primary);
+            color: var(--bg-white);
+            padding: 16px;
+            border-radius: var(--radius-input);
+            font-size: 15px;
+            font-weight: 700;
+            box-shadow: var(--shadow-btn);
+            margin-bottom: 24px;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .auth-footer {
+            text-align: center;
+            font-size: 14px;
+            color: var(--text-gray);
+        }
+
+        .auth-footer a {
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .auth-footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Pesan Error Validasi Dasar */
+        .error-msg {
+            color: #DC2626;
+            font-size: 12px;
+            margin-top: 4px;
+            display: none;
+        }
+
+        /* ========================================================
+           5. RESPONSIVENESS
+           ======================================================== */
+        @media (max-width: 992px) {
+            .split-layout { flex-direction: column; }
+            .left-panel { flex: none; padding: 40px 24px; min-height: 40vh; justify-content: center; }
+            .promo-title { font-size: 32px; }
+            .right-panel { padding: 32px 24px; }
+            .form-card { padding: 32px 24px; box-shadow: none; border: 1px solid var(--border-color); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="split-layout">
+        <!-- Sisi Kiri: Ilustrasi & Promosi -->
+        <div class="left-panel">
+            <div class="brand-logo">
+                <span style="opacity: 0; pointer-events: none;">Resik.in</span>
+            </div>
+            
+            <div class="promo-content">
+                <h1 class="promo-title">Bergabung Menjadi Mitra Resik.in dan Atur Waktu Kerjamu Sendiri!</h1>
+                <div class="promo-list">
+                    <div class="promo-item">
+                        <div class="promo-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                        </div>
+                        Penghasilan Fleksibel
+                    </div>
+                    <div class="promo-item">
+                        <div class="promo-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        </div>
+                        Bonus Menarik
+                    </div>
+                    <div class="promo-item">
+                        <div class="promo-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                        </div>
+                        Komunitas Pro
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sisi Kanan: Form Pendaftaran -->
+        <div class="right-panel">
+            <div class="form-card">
+                
+                <div class="form-header">
+                    <h2 class="form-title">Daftar Sebagai Mitra</h2>
+                    <p class="form-subtitle">Lengkapi data diri Anda untuk memulai perjalanan bersama Resik.in</p>
+                </div>
+
+                <form id="registerForm" novalidate>
+                    
+                    <!-- Input Nama Lengkap -->
+                    <div class="input-group">
+                        <label class="input-label">Nama Lengkap</label>
+                        <div class="input-wrapper">
+                            <div class="input-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                            </div>
+                            <input type="text" id="fullname" class="form-control" placeholder="Masukkan nama lengkap sesuai KTP" required>
+                        </div>
+                        <span class="error-msg" id="err-fullname">Nama lengkap wajib diisi.</span>
+                    </div>
+
+                    <!-- Input Nomor WA -->
+                    <div class="input-group">
+                        <label class="input-label">Nomor Telepon / WhatsApp</label>
+                        <div class="input-wrapper">
+                            <div class="input-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                            </div>
+                            <input type="tel" id="phone" class="form-control" placeholder="08xxxxxxxxxx" required>
+                        </div>
+                        <span class="error-msg" id="err-phone">Nomor telepon tidak valid.</span>
+                    </div>
+
+                    <!-- Input Email -->
+                    <div class="input-group">
+                        <label class="input-label">Alamat Email</label>
+                        <div class="input-wrapper">
+                            <div class="input-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path></svg>
+                            </div>
+                            <input type="email" id="email" class="form-control" placeholder="contoh@email.com" required>
+                        </div>
+                        <span class="error-msg" id="err-email">Format email tidak valid.</span>
+                    </div>
+
+                    <!-- Dropdown Kota Domisili -->
+                    <div class="input-group">
+                        <label class="input-label">Kota Domisili</label>
+                        <div class="input-wrapper">
+                            <div class="input-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                            </div>
+                            <select id="city" class="form-control" required>
+                                <option value="" disabled selected>Pilih kota tempat Anda beroperasi</option>
+                                <option value="jakarta">Jakarta Raya</option>
+                                <option value="semarang">Semarang</option>
+                                <option value="ungaran">Ungaran</option>
+                                <option value="surabaya">Surabaya</option>
+                                <option value="bandung">Bandung</option>
+                            </select>
+                            <div class="select-arrow">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            </div>
+                        </div>
+                        <span class="error-msg" id="err-city">Silakan pilih kota domisili Anda.</span>
+                    </div>
+
+                    <!-- Input Password (Interaktif Toggle) -->
+                    <div class="input-group">
+                        <label class="input-label">Kata Sandi</label>
+                        <div class="input-wrapper">
+                            <div class="input-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                            </div>
+                            <input type="password" id="password" class="form-control" placeholder="Minimal 8 karakter" required>
+                            
+                            <!-- Toggle Button -->
+                            <div class="toggle-password" id="togglePassword" title="Tampilkan/Sembunyikan Sandi">
+                                <svg class="eye-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                            </div>
+                        </div>
+                        <span class="error-msg" id="err-password">Password minimal harus 8 karakter.</span>
+                    </div>
+
+                    <!-- Checkbox Persetujuan -->
+                    <label class="checkbox-group" for="terms">
+                        <input type="checkbox" id="terms" class="custom-checkbox" required>
+                        <span class="checkbox-label">
+                            Saya menyetujui <a href="#">Syarat & Ketentuan</a> serta <a href="#">Kebijakan Privasi</a> Resik.in yang berlaku untuk Mitra.
+                        </span>
+                    </label>
+
+                    <!-- Tombol Submit -->
+                    <button type="submit" class="btn-primary">Daftar Sekarang</button>
+
+                </form>
+
+                <!-- Footer Navigasi -->
+                <div class="auth-footer">
+                    Sudah punya akun? <a href="#">Masuk di sini</a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+    const supabaseClient = supabase.createClient(
+        'https://dljidtzrnavsvxppdkdb.supabase.co',
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRsamlkdHpybmF2c3Z4cHBka2RiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxNTg5NjcsImV4cCI6MjA5NDczNDk2N30.QzqUNPeQt7tEc7hiz6l3JWV4EM2hQP0AoAfRyYQ1M30'
+    );
+
+    document.addEventListener('DOMContentLoaded', function() {
+
+        // Toggle Password
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('password');
+
+        togglePassword.addEventListener('click', function() {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.innerHTML = type === 'text'
+                ? `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>`
+                : `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
+        });
+
+        // Submit Form
+        const form = document.getElementById('registerForm');
+
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const fullname = document.getElementById('fullname').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const city = document.getElementById('city').value;
+            const password = document.getElementById('password').value;
+            const terms = document.getElementById('terms').checked;
+
+            // Reset error
+            document.querySelectorAll('.error-msg').forEach(msg => msg.style.display = 'none');
+            let isValid = true;
+
+            if (!fullname) { document.getElementById('err-fullname').style.display = 'block'; isValid = false; }
+            if (!phone || phone.length < 9) { document.getElementById('err-phone').style.display = 'block'; isValid = false; }
+            if (!/^[^ ]+@[^ ]+\.[a-z]{2,3}$/.test(email)) { document.getElementById('err-email').style.display = 'block'; isValid = false; }
+            if (!city) { document.getElementById('err-city').style.display = 'block'; isValid = false; }
+            if (password.length < 8) { document.getElementById('err-password').style.display = 'block'; isValid = false; }
+            if (!terms) { alert('Anda harus menyetujui Syarat & Ketentuan.'); isValid = false; }
+
+            if (!isValid) return;
+
+            const btnSubmit = form.querySelector('.btn-primary');
+            btnSubmit.innerText = 'Memproses...';
+            btnSubmit.style.opacity = '0.7';
+            btnSubmit.disabled = true;
+
+            try {
+                // 1. Cek email sudah terdaftar (Gunakan count atau select tanpa .single() untuk menghindari crash PGRST116)
+                const { data: existing, error: errCheck } = await supabaseClient
+                    .from('User')
+                    .select('id_user')
+                    .eq('email', email);
+
+                if (errCheck) throw errCheck;
+
+                if (existing && existing.length > 0) {
+                    alert('Email sudah terdaftar! Gunakan email lain.');
+                    btnSubmit.innerText = 'Daftar Sekarang';
+                    btnSubmit.style.opacity = '1';
+                    btnSubmit.disabled = false;
+                    return;
+                }
+
+                // 2. Insert ke tabel User
+               const { data: userData, error: errUser } = await supabaseClient
+    .from('User')
+    .insert([{
+        nama: fullname,
+        email: email,
+        password: password,
+        no_hp: phone,
+        alamat: city,
+        role: 'penyedia jasa',   // ← ada koma di sini!
+        jenis_kelamin: '',
+    }])
+    .select();
+
+                if (errUser) throw errUser;
+                if (!userData || userData.length === 0) throw new Error("Gagal mengambil data user baru.");
+
+                const newUser = userData[0];
+
+                // 3. Insert ke tabel penyedia_jasa
+                const { error: errJasa } = await supabaseClient
+                    .from('penyedia_jasa')
+                    .insert([{
+                        id_user: newUser.id_user,
+                        status_ketersediaan: 'tersedia',
+                        saldo: 0,
+                        status_verifikasi_akun: 'belum terverifikasi',
+                        foto_ktp: '', // Kosongkan dulu untuk onboarding_mitra.html
+                        no_rekening: '',
+                        nama_bank: ''
+                    }]);
+
+                if (errJasa) throw errJasa;
+
+                // 4. Simpan ke localStorage sesuai key konsisten resik_user
+                localStorage.setItem('resik_user', JSON.stringify({
+                    id_user: newUser.id_user,
+                    nama: newUser.nama,
+                    email: newUser.email,
+                    role: 'penyedia jasa'
+                }));
+
+                alert(`Selamat bergabung, ${fullname}! Akun mitra berhasil dibuat.`);
+                window.location.href = 'onboarding_mitra.html';
+
+            } catch (error) {
+                console.error(error);
+                alert('Gagal mendaftar: ' + (error.message || 'Terjadi kesalahan internal.'));
+                btnSubmit.innerText = 'Daftar Sekarang';
+                btnSubmit.style.opacity = '1';
+                btnSubmit.disabled = false;
+            }
+        });
+    });
+</script>
+</body>
+</html>

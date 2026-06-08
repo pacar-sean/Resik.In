@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mitra Resik.in - Chat Pelanggan</title>
+    <style>
+        /* ========================================================
+           1. VARIABEL GLOBAL (WAJIB SESUAI PANDUAN KONSISTENSI)
+           ======================================================== */
+        :root {
+            --primary-color: #0056D6;
+            --accent-color: #007BFF;
+            --text-dark: #1D2939;
+            --text-gray: #667085;
+            --bg-light: #F9FAFB;
+            --white: #FFFFFF;
+            --border-radius: 12px;
+            --foto-mitra: url('foto-mitra.svg'); 
+            --avatar-pelanggan: url('avatar.svg'); 
+            
+            /* Variabel Tambahan Internal */
+            --border-color: #EAECF0;
+            --danger-color: #DC2626;
+            --success-color: #10B981;
+            --bg-sidebar: #FFFFFF;
+            --chat-bg-gray: #E2E8F0;
+            --chat-bg-blue: #0056D6;
+            --sidebar-width: 260px;
+        }
+
+        /* ========================================================
+           2. RESET & TYPOGRAPHY DASAR
+           ======================================================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        a { text-decoration: none; color: inherit; transition: all 0.2s ease; cursor: pointer; display: inline-block;}
+        button { cursor: pointer; font-family: inherit; border: none; outline: none; transition: all 0.2s ease; background: transparent; }
+        input { font-family: inherit; outline: none; border: none; }
+
+        /* ========================================================
+           3. SIDEBAR (KIRI)
+           ======================================================== */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--white);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 32px 20px 24px;
+            flex-shrink: 0;
+            z-index: 20;
+        }
+
+        /* Logo Teks Murni Sesuai Instruksi */
+        .brand-logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 32px;
+            padding-left: 12px;
+            letter-spacing: -0.5px;
+        }
+
+        /* Profil Mitra */
+        .sidebar-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 32px;
+            padding-left: 12px;
+        }
+
+        .avatar-wrapper {
+            position: relative;
+            width: 48px;
+            height: 48px;
+        }
+
+        /* Implementasi Wajib: Foto Profil Mitra */
+        .profile-avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background-image: var(--foto-mitra);
+            background-size: cover;
+            background-position: center;
+            background-color: #D1E0FF; /* Fallback */
+            border: 2px solid var(--white);
+        }
+
+        .status-dot {
+            position: absolute;
+            bottom: 2px;
+            right: 0px;
+            width: 12px;
+            height: 12px;
+            background-color: var(--success-color);
+            border-radius: 50%;
+            border: 2px solid var(--white);
+        }
+
+        .profile-info { display: flex; flex-direction: column; }
+        .profile-name { font-size: 15px; font-weight: 600; color: var(--text-dark); }
+        .profile-status { font-size: 12px; color: var(--text-gray); }
+
+        /* Menu Navigasi */
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            flex-grow: 1;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            color: var(--text-gray);
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-link svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        .nav-link:hover { background-color: var(--bg-light); color: var(--text-dark); }
+        
+        /* State Aktif Sesuai Instruksi (Chat Aktif) */
+        .nav-link.active { background-color: var(--primary-color); color: var(--white); font-weight: 600; }
+
+        /* Tombol Keluar */
+        .btn-logout {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            color: var(--danger-color);
+            font-weight: 600;
+            font-size: 14px;
+            margin-top: auto;
+            border-radius: 8px;
+        }
+        .btn-logout:hover { background-color: #FEE2E2; }
+
+        /* ========================================================
+           4. KONTEN CHAT UTAMA (KANAN)
+           ======================================================== */
+        .main-wrapper {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background-color: var(--bg-light);
+        }
+
+        /* --- Header Chat --- */
+        .chat-header {
+            background-color: var(--bg-light); /* Menyatu dengan background aplikasi */
+            border-bottom: 1px solid var(--border-color);
+            padding: 16px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .customer-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background-image: var(--avatar-pelanggan);
+            background-size: cover;
+            background-position: center;
+            background-color: #CBD5E1; /* Fallback */
+            position: relative;
+        }
+        
+        /* Dot Hijau di Pelanggan */
+        .customer-avatar::after {
+            content: '';
+            position: absolute;
+            bottom: 0px;
+            right: 2px;
+            width: 12px;
+            height: 12px;
+            background-color: var(--success-color);
+            border-radius: 50%;
+            border: 2px solid var(--bg-light);
+        }
+
+        .header-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .name-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .customer-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .badge-status {
+            background-color: #E0F2FE;
+            color: #1E40AF;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 4px 8px;
+            border-radius: 6px;
+            letter-spacing: 0.5px;
+        }
+
+        .service-info {
+            font-size: 13px;
+            color: var(--text-gray);
+            font-weight: 500;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .icon-action {
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+
+        .icon-action:hover { background-color: #E8F2FF; }
+        .icon-action.dark { color: var(--text-dark); }
+        .icon-action.dark:hover { background-color: var(--border-color); }
+
+        /* --- Area Percakapan (Scrollable) --- */
+        .chat-area {
+            flex-grow: 1;
+            padding: 32px 40px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* Tanggal / Status Badge Tengah */
+        .center-badge {
+            align-self: center;
+            background-color: #E2E8F0;
+            color: var(--text-gray);
+            font-size: 12px;
+            font-weight: 500;
+            padding: 6px 16px;
+            border-radius: 20px;
+            margin-bottom: 8px;
+        }
+
+        /* Bubble Chat General */
+        .bubble-row {
+            display: flex;
+            flex-direction: column;
+            max-width: 65%;
+        }
+
+        .bubble {
+            padding: 16px 20px;
+            border-radius: 20px;
+            font-size: 15px;
+            line-height: 1.5;
+            position: relative;
+        }
+
+        .time {
+            font-size: 11px;
+            margin-top: 8px;
+            text-align: right;
+            display: block;
+        }
+
+        /* Bubble Kiri (Pelanggan) */
+        .bubble-row.left {
+            align-self: flex-start;
+        }
+        .bubble-row.left .bubble {
+            background-color: var(--chat-bg-gray);
+            color: var(--text-dark);
+            border-bottom-left-radius: 4px;
+        }
+        .bubble-row.left .time {
+            color: var(--text-gray);
+        }
+
+        /* Bubble Kanan (Mitra) */
+        .bubble-row.right {
+            align-self: flex-end;
+        }
+        .bubble-row.right .bubble {
+            background-color: var(--chat-bg-blue);
+            color: var(--white);
+            border-bottom-right-radius: 4px;
+        }
+        .bubble-row.right .time {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* Gambar Progres dalam Bubble */
+        .progress-img {
+            width: 100%;
+            max-height: 250px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        /* Badge Status Pekerjaan Bawah */
+        .work-status-badge {
+            align-self: center;
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            color: var(--primary-color);
+            font-size: 13px;
+            font-weight: 600;
+            padding: 8px 20px;
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+            margin-top: 8px;
+        }
+        .work-status-badge .dot {
+            width: 8px; height: 8px; background-color: var(--primary-color); border-radius: 50%;
+        }
+
+        /* --- Area Input Chat (Bottom) --- */
+        .input-section {
+            padding: 16px 40px 32px 40px;
+            background-color: var(--bg-light);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* Baris Tombol Cepat */
+        .quick-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .quick-btn {
+            background-color: #E8F2FF;
+            color: var(--primary-color);
+            font-size: 13px;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 20px;
+            transition: background 0.2s;
+        }
+        .quick-btn:hover { background-color: #D1E4FF; }
+
+        /* Input Bar Horizontal */
+        .input-bar {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        /* Ikon Kamera Kiri */
+        .cam-btn {
+            width: 48px;
+            height: 48px;
+            background-color: #E8F2FF;
+            color: var(--primary-color);
+            border-radius: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        .cam-btn:hover { background-color: #D1E4FF; }
+
+        /* Wrapper Input Utama */
+        .input-wrapper {
+            flex-grow: 1;
+            background-color: transparent;
+            border: 1px solid var(--border-color);
+            border-radius: 30px;
+            padding: 4px 20px;
+            display: flex;
+            align-items: center;
+            background-color: var(--white);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        
+        .input-wrapper:focus-within {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 86, 214, 0.1);
+        }
+
+        .chat-input {
+            flex-grow: 1;
+            padding: 12px 0;
+            font-size: 15px;
+            color: var(--text-dark);
+            background-color: transparent;
+        }
+        .chat-input::placeholder { color: var(--text-gray); }
+
+        .input-icons {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-gray);
+        }
+        
+        .input-icons a { display: flex; align-items: center; color: var(--text-gray); }
+        .input-icons a:hover { color: var(--text-dark); }
+
+        /* Tombol Kirim Kanan */
+        .send-btn {
+            width: 48px;
+            height: 48px;
+            background-color: var(--primary-color);
+            color: var(--white);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(0, 86, 214, 0.2);
+            transition: transform 0.2s, background-color 0.2s;
+        }
+        .send-btn:hover { background-color: var(--primary-hover); transform: scale(1.05); }
+        /* Ikon kirim sedikit digeser agar terlihat seimbang secara visual di dalam lingkaran */
+        .send-btn svg { margin-right: 2px; margin-top: 2px; } 
+
+        /* Responsiveness */
+        @media (max-width: 900px) {
+            .bubble-row { max-width: 85%; }
+        }
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; width: 100%; }
+            .chat-header { padding: 16px 20px; }
+            .chat-area { padding: 20px; }
+            .input-section { padding: 16px 20px 24px 20px; }
+            .bubble-row { max-width: 90%; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR KIRI -->
+    <aside class="sidebar">
+        <!-- Logo Teks -->
+        <div class="brand-logo">Mitra Resik.in</div>
+        
+        <!-- Profil Mitra -->
+        <div class="sidebar-profile">
+            <div class="avatar-wrapper">
+                <div class="profile-avatar"></div>
+                <div class="status-dot"></div>
+            </div>
+            <div class="profile-info">
+                <span class="profile-name">Adya Santoso</span>
+                <span class="profile-status">Status: Aktif</span>
+            </div>
+        </div>
+
+        <!-- Menu Navigasi -->
+        <nav class="nav-menu">
+            <a href="dashboard_mitra.html" class="nav-link active">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect></svg>
+                Dashboard
+            </a>
+            <a href="pesanan_masuk_mitra.html" class="nav-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                Pesanan
+            </a>
+            <a href="keuangan_mitra.html" class="nav-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
+                Keuangan
+            </a>
+            <a href="layanan_mitra.html" class="nav-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                Layanan
+            </a>
+            <a href="profil_mitra.html" class="nav-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                Profil
+            </a>
+            <!-- Chat Aktif -->
+            <a href="chat_mitra.html" class="nav-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                Chat
+            </a>
+        </nav>
+
+        <a href="#" class="btn-logout">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"></path>
+    </svg>
+    Keluar
+</a>
+    </aside>
+
+    <!-- KONTEN CHAT UTAMA KANAN -->
+    <main class="main-wrapper">
+        
+        <!-- Header Chat (Top Bar) -->
+        <header class="chat-header">
+            <div class="header-left">
+                <!-- Avatar Pelanggan menggunakan var(--avatar-pelanggan) -->
+                <div class="customer-avatar"></div>
+                <div class="header-info">
+                    <div class="name-row">
+                        <span class="customer-name">Budi Wijaya</span>
+                        <span class="badge-status">SEDANG BERJALAN</span>
+                    </div>
+                    <span class="service-details">Deep Cleaning Kos • Kebayoran Baru</span>
+                </div>
+            </div>
+            
+            <div class="header-right">
+                <a href="#" class="icon-action" aria-label="Panggil">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                </a>
+                <a href="#" class="icon-action dark" aria-label="Opsi">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
+                </a>
+            </div>
+        </header>
+
+        <!-- Area Obrolan (Bubbles) -->
+        <div class="chat-area">
+            
+            <!-- Penanda Waktu -->
+            <div class="center-badge">Hari ini</div>
+
+            <!-- Pesan Pelanggan 1 (Kiri) -->
+            <div class="bubble-row left">
+                <div class="bubble">
+                    Halo, Mas. Apakah sudah di depan kos? Pagar hijaunya jangan lupa ditutup rapat ya setelah masuk.
+                    <span class="time">10:15</span>
+                </div>
+            </div>
+
+            <!-- Pesan Mitra 1 (Kanan) -->
+            <div class="bubble-row right">
+                <div class="bubble">
+                    Selamat pagi, Bapak Budi. Saya sudah di lokasi dan sudah menutup pagar kembali. Saya mulai proses pembersihan dari area balkon dulu ya, Bu.
+                    <span class="time">10:18</span>
+                </div>
+            </div>
+
+            <!-- Pesan Pelanggan 2 (Kiri) -->
+            <div class="bubble-row left">
+                <div class="bubble">
+                    Siap, Mas. Tolong bagian sela-sela jendela balkon dibersihkan ekstra ya, kemarin berdebu banget karena ada pembangunan di sebelah.
+                    <span class="time">10:20</span>
+                </div>
+            </div>
+
+            <!-- Pesan Mitra 2 + Gambar (Kanan) -->
+            <div class="bubble-row right">
+                <div class="bubble">
+                    <!-- URL Gambar Sesuai Instruksi Prompt -->
+                    <img src="https://images.unsplash.com/photo-1527515637462-cff94eecc1ac?q=80&w=600&auto=format&fit=crop" alt="Progres Pembersihan Jendela" class="progress-img">
+                    Tentu Pak. Ini progres bagian jendela sudah selesai, debu dan kotoran sedang saya vakum dan setelah ini akan saya pel basah bagian ruang tengah.
+                    <span class="time">10:35</span>
+                </div>
+            </div>
+
+            <!-- Status Pekerjaan -->
+            <div class="work-status-badge">
+                <span class="dot"></span> Petugas Sedang Bekerja
+            </div>
+
+        </div>
+
+        <!-- Input Bar & Tombol Cepat (Bawah) -->
+        <footer class="input-section">
+            
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <a href="#" class="quick-btn">Foto Selesai</a>
+                <a href="#" class="quick-btn">Selesai & Tagih</a>
+                <a href="#" class="quick-btn">Butuh Bantuan CS</a>
+            </div>
+
+            <!-- Baris Input Chat -->
+            <div class="input-bar">
+                
+                <a href="#" class="cam-btn" aria-label="Lampiran Gambar">
+                    <!-- Ikon Kamera kotak tambah kecil -->
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                </a>
+
+                <div class="input-wrapper">
+                    <input type="text" class="chat-input" placeholder="Tulis pesan untuk pelanggan...">
+                    <div class="input-icons">
+                        <a href="#" aria-label="Emoji">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M8 14s1.5 2 4 2 4-2 4-2"></path><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line></svg>
+                        </a>
+                        <a href="#" aria-label="Lampirkan File">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
+                        </a>
+                    </div>
+                </div>
+
+                <button class="send-btn" aria-label="Kirim">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                </button>
+
+            </div>
+        </footer>
+
+    </main>
+   
+<script>
+    const SUPABASE_URL = 'https://dljidtzrnavsvxppdkdb.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRsamlkdHpybmF2c3Z4cHBka2RiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxNTg5NjcsImV4cCI6MjA5NDczNDk2N30.QzqUNPeQt7tEc7hiz6l3JWV4EM2hQP0AoAfRyYQ1M30';
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const userData = JSON.parse(localStorage.getItem('resik_user') || '{}');
+    if (!userData.id_user) window.location.href = 'login_register.html';
+
+    const params = new URLSearchParams(window.location.search);
+    const ID_PENERIMA = params.get('id_penerima');
+    const ID_JASA = params.get('id_jasa');
+
+    // --- LOAD RIWAYAT CHAT ---
+    async function loadChat() {
+    // Guard: jangan query kalau ID_JASA kosong
+    if (!ID_JASA) {
+        console.warn('Tidak ada id_jasa di URL');
+        return;
+    }
+
+    const { data, error } = await supabaseClient
+        .from('chat')
+        .select('*')
+        .or(`id_pengirim.eq.${userData.id_user},id_penerima.eq.${userData.id_user}`)
+        .eq('id_jasa', parseInt(ID_JASA))  // ← cast ke integer
+        .order('timestap', { ascending: true });
+
+    if (error) { console.error(error); return; }
+
+    const chatArea = document.querySelector('.chat-area');
+    chatArea.querySelectorAll('.bubble-row, .work-status-badge').forEach(el => el.remove());
+
+    data.forEach(msg => renderBubble(msg));
+    chatArea.scrollTop = chatArea.scrollHeight;
+}
+
+    // --- RENDER SATU BUBBLE ---
+    function renderBubble(msg) {
+        const chatArea = document.querySelector('.chat-area');
+        const isMe = msg.id_pengirim === userData.id_user;
+        const waktu = new Date(msg.timestap).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+
+        const div = document.createElement('div');
+        div.className = `bubble-row ${isMe ? 'right' : 'left'}`;
+        div.innerHTML = `
+            <div class="bubble">
+                ${msg.isi_pesan}
+                <span class="time">${waktu}</span>
+            </div>`;
+        chatArea.appendChild(div);
+    }
+
+    // --- KIRIM PESAN ---
+    async function kirimPesan() {
+        const input = document.querySelector('.chat-input');
+        const isi = input.value.trim();
+        if (!isi) return;
+
+        input.value = '';
+
+        const { error } = await supabaseClient.from('chat').insert({
+    id_pengirim: userData.id_user,
+    id_penerima: ID_PENERIMA,
+    id_jasa: parseInt(ID_JASA),  // ← tambah parseInt di sini
+    isi_pesan: isi,
+    timestap: new Date().toISOString()
+});
+
+        if (error) console.error('Gagal kirim:', error);
+    }
+
+    // --- REALTIME LISTENER ---
+    supabaseClient
+        .channel('chat-realtime-mitra')
+        .on('postgres_changes', {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'chat'
+        }, (payload) => {
+            const msg = payload.new;
+            if (msg.id_jasa === parseInt(ID_JASA) &&
+               (msg.id_pengirim === userData.id_user || msg.id_penerima === userData.id_user)) {
+                renderBubble(msg);
+                document.querySelector('.chat-area').scrollTop = 999999;
+            }
+        })
+        .subscribe();
+
+    // --- EVENT: Tombol Kirim ---
+    document.querySelector('.send-btn').addEventListener('click', kirimPesan);
+
+    // --- EVENT: Enter untuk kirim ---
+    document.querySelector('.chat-input').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') kirimPesan();
+    });
+
+    // --- Sidebar nama & Logout ---
+    document.querySelector('.profile-name').textContent = userData.nama || '-';
+
+    document.querySelector('.btn-logout').addEventListener('click', () => {
+        localStorage.removeItem('resik_user');
+        window.location.href = 'login_register.html';
+    });
+
+    loadChat();
+
+    // Load nama pelanggan
+    async function loadNamaPelanggan() {
+        if (!ID_PENERIMA) return;
+        const { data } = await supabaseClient
+            .from('User')
+            .select('nama')
+            .eq('id_user', parseInt(ID_PENERIMA))
+            .single();
+        if (data) {
+            document.querySelector('.customer-name').textContent = data.nama;
+        }
+    }
+    loadNamaPelanggan();
+</script>
+</script>
+</body>
+</html>

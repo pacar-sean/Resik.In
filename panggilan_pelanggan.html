@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resik.in - Memanggil Mitra...</title>
+    <style>
+        /* ========================================================
+           1. VARIABEL GLOBAL (WAJIB SESUAI PANDUAN KONSISTENSI)
+           ======================================================== */
+        :root {
+            /* Variabel Aset Wajib Sesuai Instruksi */
+            --logo-brand: url('logo.svg');
+            --foto-mitra: url('foto-mitra.svg');
+            
+            /* Palet Warna Identitas Brand */
+            --primary: #0056D6;       /* Biru utama Resik.in */
+            --primary-hover: #0046b0;
+            --danger: #DC2626;        /* Merah aksi untuk akhiri panggilan */
+            --danger-hover: #B91C1C;
+            --bg-page: #F4F7FB;       /* Abu-abu/Biru sangat soft & bersih */
+            --bg-card: #FFFFFF;
+            
+            /* Warna Teks & Utilitas */
+            --text-dark: #1D2939; 
+            --text-gray: #4B5563;
+            --btn-control-bg: #F1F5F9;
+            --btn-control-active: #DBEAFE;
+            
+            /* Border & Shadow */
+            --shadow-card: 0 12px 40px rgba(0, 0, 0, 0.04);
+            --shadow-avatar: 0 16px 32px rgba(0, 86, 214, 0.15);
+            --shadow-danger: 0 8px 24px rgba(220, 38, 38, 0.3);
+        }
+
+        /* ========================================================
+           2. RESET & TYPOGRAPHY DASAR
+           ======================================================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-page);
+            color: var(--text-dark);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; /* Mencegah scrolling agar full screen UI */
+            -webkit-font-smoothing: antialiased;
+        }
+
+        button { 
+            cursor: pointer; 
+            border: none; 
+            outline: none; 
+            font-family: inherit; 
+            background: transparent; 
+            transition: all 0.2s ease; 
+        }
+
+        /* ========================================================
+           3. HEADER (LOGO KANAN ATAS)
+           ======================================================== */
+        .header {
+            width: 100%;
+            padding: 32px 48px;
+            display: flex;
+            justify-content: flex-end;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 10;
+        }
+
+        /* Implementasi Wajib: Logo menggunakan Variabel Global */
+        .brand-logo {
+            width: 120px;
+            height: 36px;
+            background-image: var(--logo-brand);
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: right center;
+            /* Fallback Teks */
+            color: var(--primary);
+            font-size: 24px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+        }
+
+        /* ========================================================
+           4. AREA KONTEN TENGAH (PROFIL MITRA)
+           ======================================================== */
+        .main-container {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            gap: 48px;
+            margin-top: 40px; /* Offset dari header */
+        }
+
+        .profile-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        /* Lingkaran Avatar + Border Biru */
+        .avatar-wrapper {
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            border: 6px solid var(--primary);
+            padding: 4px; /* Memberikan efek jeda (gap) transparan antara border dan gambar */
+            box-shadow: var(--shadow-avatar);
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        /* Implementasi Wajib: Foto Profil menggunakan Variabel Global */
+        .mitra-avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background-image: var(--foto-mitra);
+            background-size: cover;
+            background-position: center;
+            background-color: #CBD5E1; /* Warna fallback jika SVG belum ada */
+        }
+
+        /* Teks Profil */
+        .mitra-name {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .call-status {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        /* Animasi 3 Titik Berkedip (Blinking Dots) */
+        .status-dots::after {
+            content: '';
+            display: inline-block;
+            width: 1em;
+            text-align: left;
+            animation: loading-dots 1.5s infinite step-start;
+        }
+
+        @keyframes loading-dots {
+            0%   { content: ''; }
+            25%  { content: '.'; }
+            50%  { content: '..'; }
+            75%  { content: '...'; }
+            100% { content: ''; }
+        }
+
+        /* ========================================================
+           5. PANEL KONTROL AKSI (ACTION CARD)
+           ======================================================== */
+        .action-card {
+            background-color: var(--bg-card);
+            border-radius: 32px;
+            padding: 40px;
+            box-shadow: var(--shadow-card);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 40px;
+            width: 100%;
+            max-width: 380px;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Baris Atas (Fitur Toggle) */
+        .control-row {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            width: 100%;
+        }
+
+        .control-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-control {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: var(--btn-control-bg);
+            color: var(--text-gray);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .btn-control:hover {
+            background-color: #E2E8F0;
+        }
+
+        /* State Aktif Tombol Interaktif */
+        .btn-control.active {
+            background-color: var(--btn-control-active);
+            color: var(--primary);
+        }
+
+        .btn-control svg {
+            width: 24px;
+            height: 24px;
+            stroke-width: 2.2;
+        }
+
+        .control-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        /* Baris Bawah (Tombol Akhiri Panggilan) */
+        .end-call-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .btn-end-call {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background-color: var(--danger);
+            color: var(--bg-card);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: var(--shadow-danger);
+        }
+
+        .btn-end-call:hover {
+            background-color: var(--danger-hover);
+            transform: scale(1.05);
+            box-shadow: 0 10px 28px rgba(220, 38, 38, 0.4);
+        }
+
+        .btn-end-call svg {
+            width: 28px;
+            height: 28px;
+            stroke-width: 2.5;
+            /* Transformasi rotate digunakan karena ikon bawaan gagang telepon menghadap ke atas */
+            transform: rotate(135deg); 
+        }
+
+        .end-call-label {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--danger);
+        }
+
+        /* Responsiveness */
+        @media (max-width: 640px) {
+            .avatar-wrapper { width: 140px; height: 140px; }
+            .mitra-name { font-size: 28px; }
+            .header { padding: 24px; justify-content: center; }
+            .brand-logo { background-position: center; justify-content: center; }
+            .action-card { padding: 32px 24px; }
+            .control-row { gap: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 1. HEADER (LOGO RESIK.IN) -->
+    <header class="header">
+        <div class="brand-logo">
+            <span style="opacity: 0; pointer-events: none;">Resik.in</span>
+        </div>
+    </header>
+
+    <!-- 2. KONTEN UTAMA (PANGGILAN) -->
+    <main class="main-container">
+        
+        <!-- Area Profil Mitra -->
+        <section class="profile-section">
+            <div class="avatar-wrapper">
+                <div class="mitra-avatar"></div>
+            </div>
+            <h1 class="mitra-name">Adya Santoso</h1>
+            <p class="call-status">Memanggil<span class="status-dots"></span></p>
+        </section>
+
+        <!-- Panel Kontrol Aksi (Kartu Putih) -->
+        <section class="action-card">
+            
+            <!-- Baris Atas: Fitur Panggilan -->
+            <div class="control-row">
+                
+                <!-- Toggle Senyap -->
+                <div class="control-item">
+                    <button class="btn-control toggle-btn" id="btn-mute" aria-label="Senyap">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="1" y1="1" x2="23" y2="23"></line>
+                            <path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"></path>
+                            <path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"></path>
+                            <line x1="12" y1="19" x2="12" y2="23"></line>
+                            <line x1="8" y1="23" x2="16" y2="23"></line>
+                        </svg>
+                    </button>
+                    <span class="control-label">Senyap</span>
+                </div>
+
+                <!-- Toggle Speaker -->
+                <div class="control-item">
+                    <button class="btn-control toggle-btn active" id="btn-speaker" aria-label="Speaker">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                        </svg>
+                    </button>
+                    <span class="control-label">Speaker</span>
+                </div>
+
+                <!-- Ke Pesan -->
+                <div class="control-item">
+                    <button class="btn-control" id="btn-chat" aria-label="Pesan">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                        </svg>
+                    </button>
+                    <span class="control-label">Pesan</span>
+                </div>
+
+            </div>
+
+            <!-- Baris Bawah: Akhiri Panggilan -->
+            <div class="end-call-section">
+                <button class="btn-end-call" id="btn-end-call" aria-label="Akhiri Panggilan">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                    </svg>
+                </button>
+                <span class="end-call-label">Akhiri Panggilan</span>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- 3. JAVASCRIPT DASAR UNTUK INTERAKSI TOMBOL -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // Logika Toggle (On/Off) untuk tombol Senyap dan Speaker
+            const toggleButtons = document.querySelectorAll('.toggle-btn');
+            
+            toggleButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // Menambahkan atau menghapus kelas 'active' pada tombol saat diklik
+                    btn.classList.toggle('active');
+                });
+            });
+
+            // Logika untuk tombol Pesan
+            const btnChat = document.getElementById('btn-chat');
+            btnChat.addEventListener('click', () => {
+                alert("Membuka ruang obrolan (Chat) dengan Adya Santoso...");
+                // window.location.href = 'chat_pelanggan.html'; // Contoh redirect
+            });
+
+            // Logika untuk tombol Akhiri Panggilan
+            const btnEndCall = document.getElementById('btn-end-call');
+            btnEndCall.addEventListener('click', () => {
+                alert("Panggilan suara diakhiri.");
+                // window.history.back(); // Redirect kembali ke halaman sebelumnya
+            });
+
+        });
+    </script>
+</body>
+</html>

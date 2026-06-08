@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mitra Resik.in - Dashboard</title>
+    <!-- FontAwesome untuk ikon relevan -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ========================================================
+           1. VARIABEL GLOBAL (WAJIB SESUAI PANDUAN)
+           ======================================================== */
+        :root {
+            --primary-color: #0056D6;
+            --accent-color: #007BFF;
+            --bg-light: #F4F7FE;
+            --white: #FFFFFF;
+            --foto-mitra: url('foto-mitra.svg'); /* Memanggil aset lokal sesuai instruksi */
+            
+            /* Variabel Tambahan Internal */
+            --text-dark: #1E293B;
+            --text-muted: #64748B;
+            --border-color: #E2E8F0;
+            --danger-color: #DC2626;
+            --success-color: #16A34A;
+            --card-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+            --border-radius: 16px;
+        }
+
+        /* ========================================================
+           2. RESET & TYPOGRAPHY DASAR
+           ======================================================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+            display: flex;
+        }
+
+        a { text-decoration: none; color: inherit; transition: all 0.2s; }
+        button { cursor: pointer; border: none; outline: none; font-family: inherit; transition: all 0.2s ease; }
+
+        /* ========================================================
+           3. LAYOUT UTAMA
+           ======================================================== */
+        .app-container {
+            display: flex;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- SIDEBAR KIRI --- */
+        .sidebar {
+            width: 260px;
+            background-color: var(--white);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 32px 20px 24px;
+            flex-shrink: 0;
+            z-index: 10;
+        }
+
+        .brand-title {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--primary-color);
+            margin-bottom: 32px;
+            padding-left: 12px;
+        }
+
+        /* Profil Sidebar */
+        .sidebar-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 32px;
+            padding-left: 12px;
+        }
+
+        .avatar-wrapper {
+            position: relative;
+            width: 44px;
+            height: 44px;
+        }
+
+        .avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background-image: var(--foto-mitra);
+            background-size: cover;
+            background-position: center;
+            background-color: #CBD5E1;
+        }
+
+        .status-dot {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 12px;
+            height: 12px;
+            background-color: var(--success-color);
+            border-radius: 50%;
+            border: 2px solid var(--white);
+        }
+
+        .profile-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .profile-name { font-size: 15px; font-weight: 600; color: var(--text-dark); }
+        .profile-status { font-size: 12px; color: var(--text-muted); }
+
+        /* Menu Navigasi */
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            flex-grow: 1;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .nav-link i { width: 20px; text-align: center; font-size: 16px; }
+        .nav-link:hover { background-color: var(--bg-light); color: var(--text-dark); }
+        .nav-link.active { background-color: var(--primary-color); color: var(--white); }
+
+        .btn-logout {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            color: var(--danger-color);
+            font-weight: 600;
+            font-size: 14px;
+            margin-top: auto;
+            border-radius: 12px;
+            background: transparent;
+        }
+        .btn-logout i { width: 20px; text-align: center; font-size: 16px; }
+        .btn-logout:hover { background-color: #FEE2E2; }
+
+        /* --- KONTEN UTAMA --- */
+        .main-wrapper {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            background-color: var(--bg-light);
+        }
+
+        /* Top Bar */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px 40px;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--primary-color);
+        }
+
+        .top-controls {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        /* Toggle Switch Ready */
+        .status-toggle {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background-color: var(--white);
+            padding: 6px 16px;
+            border-radius: 24px;
+            font-size: 14px;
+            color: var(--text-muted);
+            box-shadow: var(--card-shadow);
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 22px;
+        }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #CBD5E1;
+            transition: .4s;
+            border-radius: 22px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px; width: 16px;
+            left: 3px; bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider { background-color: var(--primary-color); }
+        input:checked + .slider:before { transform: translateX(18px); }
+
+        .icon-bell {
+            font-size: 20px;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .icon-bell:hover { color: var(--primary-color); }
+
+        .mini-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-image: var(--foto-mitra);
+            background-size: cover;
+            background-position: center;
+            background-color: #CBD5E1;
+            cursor: pointer;
+        }
+
+        /* Dashboard Content Split */
+        .dashboard-content {
+            padding: 0 40px 40px;
+            display: flex;
+            gap: 32px;
+        }
+
+        /* Kolom Kiri (Stats & Pesanan Baru) */
+        .col-left {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        /* 4 Grid Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+
+        .stat-card {
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--card-shadow);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .stat-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+
+        .stat-body {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--accent-color);
+        }
+
+        .stat-badge {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 12px;
+        }
+        .badge-blue-light { background-color: #E0E7FF; color: var(--primary-color); }
+        .icon-star { color: #F59E0B; font-size: 16px; }
+
+        /* Pesanan Baru Section */
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .badge-red {
+            background-color: var(--danger-color);
+            color: var(--white);
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 12px;
+        }
+
+        .orders-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .order-card {
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            padding: 24px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .order-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 24px;
+        }
+
+        .order-info-wrap {
+            display: flex;
+            gap: 16px;
+        }
+
+        .order-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 12px;
+            background-color: #E0E7FF;
+            color: var(--primary-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .order-details {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .order-tags {
+            display: flex;
+            gap: 8px;
+        }
+
+        .tag {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 4px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+        .tag-blue { background-color: #DBEAFE; color: var(--primary-color); }
+        .tag-orange { background-color: #FEF3C7; color: #D97706; }
+        .tag-gray { background-color: #F1F5F9; color: var(--text-muted); }
+
+        .order-name { font-size: 18px; font-weight: 700; color: var(--text-dark); }
+        .order-location { font-size: 13px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+
+        .order-price-wrap {
+            text-align: right;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .order-price { font-size: 20px; font-weight: 700; color: var(--primary-color); }
+        .order-est { font-size: 12px; color: var(--text-muted); }
+
+        .order-actions {
+            display: flex;
+            gap: 16px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary { background-color: var(--primary-color); color: var(--white); }
+        .btn-primary:hover { background-color: var(--primary-hover); }
+        
+        .btn-outline { background-color: var(--white); border: 1px solid #E2E8F0; color: var(--text-muted); }
+        .btn-outline:hover { background-color: #F8FAFC; color: var(--text-dark); }
+
+        /* Kolom Kanan (Jadwal & Tips) */
+        .col-right {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            min-width: 300px;
+        }
+
+        .schedule-card {
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            padding: 24px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 16px;
+            margin-top: 16px;
+            margin-bottom: 24px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 3px;
+            top: 6px;
+            bottom: 0;
+            width: 2px;
+            background-color: var(--border-color);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 24px;
+        }
+        .timeline-item:last-child { margin-bottom: 0; }
+
+        .timeline-dot {
+            position: absolute;
+            left: -17px;
+            top: 6px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #CBD5E1;
+            border: 2px solid var(--white);
+        }
+        .timeline-item.active .timeline-dot { background-color: var(--primary-color); }
+        .timeline-item.active .timeline-line-active {
+            position: absolute;
+            left: -16px;
+            top: 16px;
+            bottom: -32px;
+            width: 2px;
+            background-color: var(--primary-color);
+            z-index: 1;
+        }
+
+        .time { font-size: 13px; font-weight: 700; color: var(--text-muted); margin-bottom: 4px; }
+        .timeline-item.active .time { color: var(--primary-color); }
+        
+        .task-name { font-size: 14px; font-weight: 600; color: var(--text-dark); margin-bottom: 4px; line-height: 1.4; }
+        .task-status { font-size: 12px; color: var(--text-muted); margin-bottom: 8px; }
+        
+        .link-detail { font-size: 12px; font-weight: 600; color: var(--primary-color); display: inline-flex; align-items: center; gap: 4px; }
+        .link-detail:hover { text-decoration: underline; }
+
+        .btn-light-blue {
+            width: 100%;
+            background-color: #E0E7FF;
+            color: var(--primary-color);
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            text-align: center;
+        }
+        .btn-light-blue:hover { background-color: #D1E0FF; }
+
+        /* Tips Performa Card */
+        .tips-card {
+            background-color: var(--primary-color);
+            border-radius: var(--border-radius);
+            padding: 24px;
+            color: var(--white);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0, 86, 214, 0.3);
+        }
+
+        .tips-card::after {
+            content: '';
+            position: absolute;
+            bottom: -30px;
+            right: -30px;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 20px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .tips-title { font-size: 16px; font-weight: 700; margin-bottom: 12px; position: relative; z-index: 2; }
+        .tips-desc { font-size: 13px; line-height: 1.6; opacity: 0.9; position: relative; z-index: 2; }
+
+        /* Responsiveness */
+        @media (max-width: 1100px) {
+            .dashboard-content { flex-direction: column; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .top-bar { padding: 20px; flex-direction: column; align-items: flex-start; gap: 16px; }
+            .top-controls { width: 100%; justify-content: space-between; }
+            .dashboard-content { padding: 0 20px 20px; }
+            .order-top { flex-direction: column; gap: 16px; }
+            .order-price-wrap { text-align: left; }
+            .order-actions { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <h1 class="brand-title">Mitra Resik.in</h1>
+            
+            <div class="sidebar-profile">
+                <div class="avatar-wrapper">
+                    <!-- Avatar dipanggil via CSS variable --foto-mitra -->
+                    <div class="avatar"></div>
+                    <div class="status-dot"></div>
+                </div>
+                <div class="profile-info">
+                    <span class="profile-name">Adya Santoso</span>
+                    <span class="profile-status">Status: Aktif</span>
+                </div>
+            </div>
+
+            <nav class="nav-menu">
+    <a href="dashboard_mitra.html" class="nav-link active">
+        <i class="fa-solid fa-border-all"></i> Dashboard
+    </a>
+    <a href="pesanan_masuk_mitra.html" class="nav-link">
+    <i class="fa-solid fa-clipboard-list"></i> Pesanan
+</a>
+    <a href="keuangan_mitra.html" class="nav-link">
+        <i class="fa-solid fa-wallet"></i> Keuangan
+    </a>
+    <a href="layanan_mitra.html" class="nav-link">
+        <i class="fa-solid fa-broom"></i> Layanan
+    </a>
+    <a href="profil_mitra.html" class="nav-link">
+        <i class="fa-regular fa-user"></i> Profil
+    </a>
+    <a href="chat_mitra.html" class="nav-link">
+        <i class="fa-regular fa-comment-dots"></i> Chat
+    </a>
+</nav>
+
+            <button class="btn-logout" onclick="alert('Keluar dari sistem...')">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i> Keluar
+            </button>
+        </aside>
+
+        <!-- KONTEN UTAMA -->
+        <main class="main-wrapper">
+            
+            <!-- Header Top Bar -->
+            <header class="top-bar">
+                <h1 class="page-title">Mitra Dashboard</h1>
+                <div class="top-controls">
+                    <div class="status-toggle">
+                        <span>Status: Ready</span>
+                        <label class="switch">
+                            <input type="checkbox" checked id="statusSwitch">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <i class="fa-regular fa-bell icon-bell" title="Notifikasi"></i>
+                    <!-- Mini Avatar -->
+                    <div class="mini-avatar" title="Profil Anda"></div>
+                </div>
+            </header>
+
+            <!-- Grid Konten Dashboard -->
+            <div class="dashboard-content">
+                
+                <!-- KOLOM KIRI (Stats & Pesanan Baru) -->
+                <div class="col-left">
+                    
+                    <!-- 4 Kartu Statistik -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-title">Pesanan Selesai Hari Ini</div>
+                            <div class="stat-body">
+                                <span class="stat-value">8</span>
+                                <span class="stat-badge badge-blue-light">+12%</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-title">Pendapatan Hari Ini</div>
+                            <div class="stat-body">
+                                <span class="stat-value">Rp 450k</span>
+                                <span class="stat-badge badge-blue-light">Target 80%</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-title">Rating Performa</div>
+                            <div class="stat-body">
+                                <span class="stat-value" style="color: var(--accent-color);">4.9/5.0</span>
+                                <i class="fa-solid fa-star icon-star"></i>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-title">Jam Kerja</div>
+                            <div class="stat-body">
+                                <span class="stat-value" style="color: var(--accent-color);">06:42</span>
+                                <span style="font-size: 13px; color: var(--text-dark); font-weight: 500;">Jam</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- List Pesanan Baru -->
+                    <div class="orders-section">
+                        <div class="section-header">
+                            <h2 class="section-title">
+                                <i class="fa-solid fa-asterisk" style="color: var(--primary-color);"></i> Pesanan Baru
+                            </h2>
+                            <span class="badge-red">2 Menit Lalu</span>
+                        </div>
+
+                        <div class="orders-list">
+                            
+                            <!-- Kartu Pesanan 1 -->
+                            <div class="order-card">
+                                <div class="order-top">
+                                    <div class="order-info-wrap">
+                                        <div class="order-icon">
+                                            <i class="fa-solid fa-building"></i>
+                                        </div>
+                                        <div class="order-details">
+                                            <div class="order-tags">
+                                                <span class="tag tag-blue">KOS-KOSAN</span>
+                                                <span class="tag tag-orange">DEEP CLEANING</span>
+                                            </div>
+                                            <h3 class="order-name">Pembersihan Kamar Kos</h3>
+                                            <span class="order-location">
+                                                <i class="fa-solid fa-location-dot"></i> Area: Kebayoran Baru, Jakarta Selatan
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="order-price-wrap">
+                                        <span class="order-price">Rp 25.000</span>
+                                        <span class="order-est">Estimasi 2 Jam</span>
+                                    </div>
+                                </div>
+                                <div class="order-actions">
+                                    <button class="btn btn-primary" onclick="alert('Pesanan Diterima!')">
+                                        <i class="fa-regular fa-circle-check"></i> Terima Pesanan
+                                    </button>
+                                    <button class="btn btn-outline" onclick="alert('Pesanan Ditolak.')">
+                                        Tolak
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Kartu Pesanan 2 -->
+                            <div class="order-card">
+                                <div class="order-top">
+                                    <div class="order-info-wrap">
+                                        <div class="order-icon" style="background-color: #E0E7FF;">
+                                            <i class="fa-solid fa-house"></i>
+                                        </div>
+                                        <div class="order-details">
+                                            <div class="order-tags">
+                                                <span class="tag tag-blue">KONTRAKAN</span>
+                                                <span class="tag tag-gray">STANDARD</span>
+                                            </div>
+                                            <h3 class="order-name">Pembersihan Rumah 2KT</h3>
+                                            <span class="order-location">
+                                                <i class="fa-solid fa-location-dot"></i> Area: Tebet, Jakarta Selatan
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="order-price-wrap">
+                                        <span class="order-price">Rp 75.000</span>
+                                        <span class="order-est">Estimasi 3 Jam</span>
+                                    </div>
+                                </div>
+                                <div class="order-actions">
+                                    <button class="btn btn-primary" onclick="alert('Pesanan Diterima!')">
+                                        <i class="fa-regular fa-circle-check"></i> Terima Pesanan
+                                    </button>
+                                    <button class="btn btn-outline" onclick="alert('Pesanan Ditolak.')">
+                                        Tolak
+                                    </button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- KOLOM KANAN (Jadwal & Tips) -->
+                <div class="col-right">
+                    
+                    <!-- Jadwal Hari Ini -->
+                    <div class="schedule-card">
+                        <div class="section-header" style="margin-bottom: 0;">
+                            <h2 class="section-title">
+                                <i class="fa-regular fa-calendar" style="color: var(--primary-color);"></i> Jadwal Hari Ini
+                            </h2>
+                        </div>
+                        
+                        <div class="timeline">
+                            <!-- Item Aktif -->
+                            <div class="timeline-item active">
+                                <div class="timeline-line-active"></div>
+                                <div class="timeline-dot"></div>
+                                <div class="time">09:00 - 11:00</div>
+                                <h4 class="task-name">Deep Cleaning - Apartemen Sudirman</h4>
+                                <div class="task-status">Status: Menuju Lokasi</div>
+                                <a href="#" class="link-detail">Lihat Detail <i class="fa-solid fa-arrow-right" style="font-size: 10px;"></i></a>
+                            </div>
+
+                            <!-- Item Pending 1 -->
+                            <div class="timeline-item">
+                                <div class="timeline-dot"></div>
+                                <div class="time">13:30 - 15:30</div>
+                                <h4 class="task-name">Standard Cleaning - Kos Setiabudi</h4>
+                                <div class="task-status">Status: Terjadwal</div>
+                            </div>
+
+                            <!-- Item Pending 2 -->
+                            <div class="timeline-item">
+                                <div class="timeline-dot"></div>
+                                <div class="time">16:00 - 18:00</div>
+                                <h4 class="task-name">Pembersihan Kamar Mandi - Tebet</h4>
+                                <div class="task-status">Status: Terjadwal</div>
+                            </div>
+                        </div>
+
+                        <button class="btn-light-blue" onclick="alert('Membuka jadwal penuh...')">
+                            Lihat Semua Jadwal
+                        </button>
+                    </div>
+
+                    <!-- Tips Performa -->
+                    <div class="tips-card">
+                        <h3 class="tips-title">Tips Performa</h3>
+                        <p class="tips-desc">Datang 10 menit lebih awal meningkatkan peluang Anda mendapatkan rating bintang 5 dari pelanggan!</p>
+                    </div>
+
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+    const SUPABASE_URL = 'https://dljidtzrnavsvxppdkdb.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRsamlkdHpybmF2c3Z4cHBka2RiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxNTg5NjcsImV4cCI6MjA5NDczNDk2N30.QzqUNPeQt7tEc7hiz6l3JWV4EM2hQP0AoAfRyYQ1M30';
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const currentUser = JSON.parse(localStorage.getItem('resik_user'));
+
+    async function init() {
+        if (!currentUser || currentUser.role !== 'penyedia jasa') {
+            window.location.href = 'login_register.html';
+            return;
+        }
+
+        // Tampilkan nama mitra
+        document.querySelector('.profile-name').textContent = currentUser.nama;
+
+        // Ambil data penyedia_jasa
+        const { data: jasa } = await supabaseClient
+            .from('penyedia_jasa')
+            .select('*')
+            .eq('id_user', currentUser.id_user)
+            .single();
+
+        if (jasa) {
+    const isReady = jasa.status_ketersediaan === 'tersedia';
+    document.getElementById('statusSwitch').checked = isReady;
+    document.querySelector('.status-toggle span').textContent = 
+        isReady ? 'Status: Ready' : 'Status: Sibuk';
+
+    // Simpan id_layanan (7) bukan id_jasa (2)
+    currentUser.id_jasa = 7; // id_layanan yang sesuai
+    localStorage.setItem('resik_user', JSON.stringify(currentUser));
+}
+
+        // Load pesanan baru
+        await loadPesananBaru();
+    }
+
+    // Toggle status ketersediaan
+    document.getElementById('statusSwitch').addEventListener('change', async function() {
+        const status = this.checked ? 'tersedia' : 'tidak tersedia';
+        document.querySelector('.status-toggle span').textContent = 
+            this.checked ? 'Status: Ready' : 'Status: Sibuk';
+
+        await supabaseClient
+            .from('penyedia_jasa')
+            .update({ status_ketersediaan: status })
+            .eq('id_user', currentUser.id_user);
+    });
+
+    async function loadPesananBaru() {
+        const { data: pesanan, error } = await supabaseClient
+            .from('pesanan')
+            .select('*')
+            .eq('id_layanan', currentUser.id_jasa)
+            .eq('status', 'menunggu')
+            .order('id_pesanan', { ascending: false })
+            .limit(5);
+
+        if (error || !pesanan || pesanan.length === 0) return;
+
+        // Update badge jumlah pesanan
+        // (opsional: render ulang kartu pesanan dari data nyata)
+        console.log('Pesanan baru:', pesanan);
+    }
+
+    // Logout
+    document.querySelector('.btn-logout').addEventListener('click', () => {
+        localStorage.removeItem('resik_user');
+        window.location.href = 'login_register.html';
+    });
+
+    init();
+</script>
+</body>
+</html>

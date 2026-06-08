@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resik.in - Ringkasan Pesanan</title>
+    <style>
+        /* ========================================================
+           1. VARIABEL GLOBAL (WAJIB SESUAI PANDUAN)
+           ======================================================== */
+        :root {
+            /* Variabel Aset Utama */
+            --foto-profil: url('avatar.svg');
+            --logo-brand: url('logo.svg');
+            
+            /* Palet Warna Identitas Brand */
+            --primary: #0056D6; 
+            --primary-hover: #0046b0;
+            --bg-page: #F8FAFC; 
+            --bg-white: #FFFFFF;
+            --bg-badge: #E8F2FF;
+            --bg-alert: #F3F4F6;
+            
+            /* Warna Teks */
+            --text-dark: #111827; 
+            --text-gray: #4B5563;
+            --text-light-gray: #9CA3AF;
+            
+            /* Border & Shadow */
+            --border-color: #E5E7EB;
+            --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.04);
+        }
+
+        /* ========================================================
+           2. RESET & TYPOGRAPHY DASAR
+           ======================================================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-page);
+            color: var(--text-dark);
+            -webkit-font-smoothing: antialiased;
+            line-height: 1.5;
+        }
+
+        a { text-decoration: none; color: inherit; }
+        button { cursor: pointer; border: none; outline: none; font-family: inherit; transition: all 0.2s ease; background: transparent; }
+
+        /* ========================================================
+           3. HEADER ATAS (FULL WIDTH NAVBAR)
+           ======================================================== */
+        .header {
+            background-color: var(--bg-white);
+            border-bottom: 1px solid var(--border-color);
+            padding: 16px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+        }
+
+        /* Implementasi Wajib: Logo menggunakan Variabel Global */
+        .brand-logo {
+            width: 300px;
+            height: 80px;
+            background-image: var(--logo-brand);
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center left;
+            /* Fallback Teks */
+            color: var(--primary);
+            font-size: 24px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+        }
+
+        .btn-back {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            font-size: 15px;
+            color: var(--text-dark);
+            padding: 8px 12px;
+            border-radius: 8px;
+        }
+
+        .btn-back:hover {
+            background-color: var(--bg-page);
+            transform: translateX(-4px);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--primary);
+        }
+
+        /* ========================================================
+           4. LAYOUT KONTEN UTAMA
+           ======================================================== */
+        .main-container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 40px;
+        }
+
+        .page-title-section {
+            margin-bottom: 32px;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 15px;
+            color: var(--text-gray);
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 32px;
+            align-items: start;
+        }
+
+        /* ========================================================
+           5. KONTEN KIRI (KARTU INFORMASI DETAIL)
+           ======================================================== */
+        .card {
+            background-color: var(--bg-white);
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: var(--shadow-card);
+            border: 1px solid rgba(229, 231, 235, 0.5);
+            margin-bottom: 24px;
+        }
+
+        /* Kartu Paket Utama */
+        .package-card {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            position: relative;
+        }
+
+        .package-icon-box {
+            width: 72px;
+            height: 72px;
+            background-color: var(--primary);
+            border-radius: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--bg-white);
+            flex-shrink: 0;
+        }
+
+        .package-info h2 {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+        }
+
+        .package-info p {
+            font-size: 15px;
+            color: var(--text-gray);
+        }
+
+        .badge-premium {
+            position: absolute;
+            right: 32px;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: var(--bg-badge);
+            color: var(--primary);
+            font-size: 13px;
+            font-weight: 600;
+            padding: 6px 16px;
+            border-radius: 20px;
+        }
+
+        /* Grid Baris Bawah (Jadwal & Alamat) */
+        .details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .detail-card {
+            background-color: var(--bg-white);
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: var(--shadow-card);
+            border: 1px solid rgba(229, 231, 235, 0.5);
+        }
+
+        .detail-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .icon-circle {
+            width: 40px;
+            height: 40px;
+            background-color: var(--bg-badge);
+            color: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .detail-title {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            color: var(--text-dark);
+            text-transform: uppercase;
+        }
+
+        .detail-content h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .detail-content p {
+            font-size: 14px;
+            color: var(--text-gray);
+            line-height: 1.5;
+        }
+
+        .time-icon { color: var(--text-gray); }
+
+        /* ========================================================
+           6. KONTEN KANAN (RINCIAN BIAYA / SIDEBAR)
+           ======================================================== */
+        .sidebar-card {
+            background-color: var(--bg-white);
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: var(--shadow-card);
+            border: 1px solid rgba(229, 231, 235, 0.5);
+            position: sticky;
+            top: 100px;
+        }
+
+        .sidebar-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 24px;
+        }
+
+        .cost-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .cost-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .cost-label-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .cost-label {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .cost-sub {
+            font-size: 13px;
+            color: var(--text-gray);
+        }
+
+        .cost-value {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .divider {
+            height: 1px;
+            background-color: var(--border-color);
+            margin: 24px 0;
+            border: none;
+        }
+
+        .total-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+        }
+
+        .total-label {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .total-value {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        /* Action Buttons */
+        .btn-primary {
+            width: 100%;
+            background-color: var(--primary);
+            color: var(--bg-white);
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-outline {
+            width: 100%;
+            background-color: var(--bg-white);
+            color: var(--primary);
+            border: 1px solid var(--border-color);
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+
+        .btn-outline:hover {
+            background-color: #F9FAFB;
+        }
+
+        /* Kotak Catatan Bawah */
+        .note-box {
+            background-color: var(--bg-alert);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .note-icon {
+            color: var(--text-gray);
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .note-text {
+            font-size: 12px;
+            color: var(--text-gray);
+            line-height: 1.5;
+        }
+
+        /* Responsiveness */
+        @media (max-width: 1024px) {
+            .content-grid { grid-template-columns: 1fr; }
+            .sidebar-card { position: relative; top: 0; }
+            .badge-premium { position: relative; right: 0; top: 0; transform: none; margin-top: 16px; display: inline-block; }
+            .package-card { flex-direction: column; align-items: flex-start; gap: 16px; }
+            .details-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 640px) {
+            .header, .main-container { padding-left: 20px; padding-right: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 1. HEADER ATAS -->
+    <header class="header">
+        <div class="header-left">
+            <!-- Logo menggunakan Var -->
+            <div class="brand-logo">
+                <span style="opacity: 0; pointer-events: none;">Resik.in</span>
+            </div>
+            
+            <button class="btn-back" id="btnBack">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                Back
+            </button>
+        </div>
+
+        <div class="header-right">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                <path d="M19 11V7c0-3.866-3.134-7-7-7S5 3.134 5 7v4H4v13h16V11h-1zm-7-9c2.761 0 5 2.239 5 5v4H7V7c0-2.761 2.239-5 5-5zm0 15c-1.105 0-2-.895-2-2s.895-2 2-2 2 .895 2 2-.895 2-2 2z"/>
+            </svg>
+            Pembayaran Aman
+        </div>
+    </header>
+
+    <!-- 2. KONTEN UTAMA -->
+    <main class="main-container">
+        
+        <!-- Judul Halaman -->
+        <div class="page-title-section">
+            <h1 class="page-title">Ringkasan Pesanan</h1>
+            <p class="page-subtitle">Periksa kembali detail pesanan Anda sebelum melanjutkan ke pembayaran.</p>
+        </div>
+
+        <div class="content-grid">
+            
+            <!-- KOLOM KIRI (KARTU DETAIL) -->
+            <div class="left-column">
+                
+                <!-- Kartu 1 (Paket Utama) -->
+                <div class="card package-card">
+                    <div class="package-icon-box">
+                        <!-- Ikon Sapu/Kebersihan -->
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 9.5V15a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9.5C2 8.12 3.12 7 4.5 7h15C20.88 7 22 8.12 22 9.5z"></path>
+                            <path d="M12 7V3"></path>
+                            <path d="M8 17v4"></path>
+                            <path d="M16 17v4"></path>
+                            <path d="M12 17v4"></path>
+                        </svg>
+                    </div>
+                    <div class="package-info">
+                        <h2>Deep Cleaning</h2>
+                        <p>Pembersihan menyeluruh ke setiap sudut ruangan.</p>
+                    </div>
+                    <div class="badge-premium">Layanan Premium</div>
+                </div>
+
+                <!-- Grid Baris Bawah -->
+                <div class="details-grid">
+                    
+                    <!-- Kartu Jadwal -->
+                    <div class="detail-card">
+                        <div class="detail-header">
+                            <div class="icon-circle">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                                </svg>
+                            </div>
+                            <span class="detail-title">Jadwal Pelaksanaan</span>
+                        </div>
+                        <div class="detail-content">
+                            <h3>24 Okt 2024</h3>
+                            <h3 style="font-size: 15px; color: var(--text-gray); font-weight: 500;">
+                                <svg class="time-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <polyline points="12 6 12 12 16 14"></polyline>
+                                </svg>
+                                09:00 WIB
+                            </h3>
+                        </div>
+                    </div>
+
+                    <!-- Kartu Alamat -->
+                    <div class="detail-card">
+                        <div class="detail-header">
+                            <div class="icon-circle">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                    <circle cx="12" cy="10" r="3"></circle>
+                                </svg>
+                            </div>
+                            <span class="detail-title">Alamat Layanan</span>
+                        </div>
+                        <div class="detail-content">
+                            <h3>Jl. Menteng</h3>
+                            <p>Jakarta Pusat, Daerah Khusus Ibukota Jakarta. (Dekat taman kota)</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- 3. KOLOM KANAN (RINCIAN BIAYA / SIDEBAR) -->
+            <div class="right-column">
+                <div class="sidebar-card">
+                    <h2 class="sidebar-title">Rincian Biaya</h2>
+                    
+                    <div class="cost-list">
+                        <!-- Sesuai dengan instruksi perbaikan typo pada gambar -->
+                        <div class="cost-item">
+                            <div class="cost-label-group">
+                                <span class="cost-label">Harga Paket</span>
+                                <span class="cost-sub">Deep Cleaning</span>
+                            </div>
+                            <span class="cost-value">Rp 50.000</span>
+                        </div>
+
+                        <div class="cost-item">
+                            <div class="cost-label-group">
+                                <span class="cost-label">Tambahan</span>
+                                <span class="cost-sub">Cairan Disinfektan Khusus</span>
+                            </div>
+                            <span class="cost-value">Rp 5.000</span>
+                        </div>
+
+                        <div class="cost-item">
+                            <div class="cost-label-group">
+                                <span class="cost-label">PPN</span>
+                                <span class="cost-sub">11% sesuai ketentuan</span>
+                            </div>
+                            <span class="cost-value">Rp 5.500</span>
+                        </div>
+                    </div>
+
+                    <hr class="divider">
+
+                    <div class="total-section">
+                        <span class="total-label">Total Pembayaran</span>
+                        <span class="total-value">Rp 60.500</span>
+                    </div>
+
+                    <!-- Tombol Interaktif -->
+                    <button class="btn-primary" id="btnLanjut">
+                        Lanjut ke Pembayaran 
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12 5 19 12 12 19"></polyline>
+                        </svg>
+                    </button>
+                    
+                    <button class="btn-outline" id="btnUbah">
+                        Ubah Detail
+                    </button>
+
+                    <!-- Kotak Catatan Bawah -->
+                    <div class="note-box">
+                        <div class="note-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+                            </svg>
+                        </div>
+                        <p class="note-text">Dengan melanjutkan ke pembayaran, Anda menyetujui Syarat & Ketentuan layanan kami.</p>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- JAVASCRIPT DASAR UNTUK INTERAKSI TOMBOL -->
+  <script type="module">
+    import { supabase } from './supabase.js'
+
+    // Ambil pesanan terakhir dari Supabase
+    async function loadRingkasan() {
+        const { data, error } = await supabase
+            .from('pesanan')
+            .select('*')
+            .order('id_pesanan', { ascending: false })
+            .limit(1)
+            .single()
+
+        if (error) {
+            console.error('Error:', error)
+            return
+        }
+
+        // Isi data ke halaman
+        document.querySelector('.package-info h2').textContent = data.jenis_pesanan
+        
+        // Format tanggal
+        const tgl = new Date(data.tgl_pesan)
+        const opsiTanggal = { day: 'numeric', month: 'long', year: 'numeric' }
+        const opsiJam = { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' }
+        document.querySelector('.detail-content h3').textContent = tgl.toLocaleDateString('id-ID', opsiTanggal)
+        document.querySelector('.detail-content h3:nth-child(2)').innerHTML = `
+            <svg class="time-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            ${tgl.toLocaleTimeString('id-ID', opsiJam)} WIB
+        `
+
+        // Isi harga
+        const harga = parseFloat(data.harga)
+        const ppn = harga * 0.11
+        const total = harga
+        document.querySelector('.cost-value').textContent = 'Rp ' + (harga - ppn).toLocaleString('id-ID')
+        document.querySelector('.total-value').textContent = 'Rp ' + total.toLocaleString('id-ID')
+
+        // Simpan id_pesanan untuk halaman berikutnya
+        localStorage.setItem('id_pesanan', data.id_pesanan)
+    }
+
+    loadRingkasan()
+
+    // Tombol Back
+    document.getElementById('btnBack').addEventListener('click', function() {
+        if(window.history.length > 1) window.history.back()
+        else window.location.href = 'form_pemesanan.html'
+    })
+
+    // Tombol Lanjut ke Pembayaran
+    document.getElementById('btnLanjut').addEventListener('click', function() {
+        window.location.href = 'metode_pembayaran.html'
+    })
+
+    // Tombol Ubah Detail
+    document.getElementById('btnUbah').addEventListener('click', function() {
+        window.location.href = 'form_pemesanan.html'
+    })
+</script>
+</body>
+</html>

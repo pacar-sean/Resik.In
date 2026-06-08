@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resik.in - Lacak Pesanan</title>
+    <style>
+        /* ========================================================
+           1. VARIABEL GLOBAL (WAJIB SESUAI PANDUAN KONSISTENSI)
+           ======================================================== */
+        :root {
+            /* Variabel Aset Utama */
+            --foto-profil: url('avatar.svg');
+            --logo-brand: url('logo.svg');
+            
+            /* Palet Warna Identitas Brand */
+            --primary: #0056D6; 
+            --primary-hover: #0046b0;
+            --success: #10B981; /* Hijau sukses (digunakan untuk ikon WA sesuai prompt) */
+            --step-completed: #8C6B14; /* Warna olive/emas gelap untuk step selesai sesuai gambar */
+            --bg-page: #F8FAFC; 
+            --bg-sidebar: #FFFFFF;
+            --bg-footer: #DCE5F5; /* Biru abu-abu soft untuk footer */
+            
+            /* Warna Teks */
+            --text-dark: #111827; 
+            --text-gray: #4B5563;
+            --text-light-gray: #9CA3AF;
+            
+            /* Border & Shadow */
+            --border-color: #E5E7EB;
+            --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.03);
+            --shadow-btn: 0 4px 12px rgba(0, 86, 214, 0.15);
+        }
+
+        /* ========================================================
+           2. RESET & TYPOGRAPHY DASAR
+           ======================================================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+        }
+
+        body {
+            display: flex;
+            height: 100vh;
+            background-color: var(--bg-page);
+            color: var(--text-dark);
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+        button { cursor: pointer; border: none; outline: none; font-family: inherit; transition: all 0.2s ease; background: transparent; }
+
+        /* ========================================================
+           3. LAYOUT UTAMA (SIDEBAR & KONTEN)
+           ======================================================== */
+        .sidebar {
+            width: 260px;
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 24px;
+            flex-shrink: 0;
+            z-index: 20;
+        }
+
+        .main-wrapper {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            background-color: var(--bg-page);
+        }
+
+        .main-content {
+            padding: 32px 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            flex-grow: 1;
+        }
+
+        /* ========================================================
+           4. SIDEBAR
+           ======================================================== */
+        .brand {
+            margin-bottom: 40px;
+            padding-left: 12px;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Implementasi Wajib: Logo menggunakan Variabel Global */
+        .brand-logo-img {
+            width: 300px;
+            height: 80px;
+            background-image: var(--logo-brand);
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: left center;
+            color: var(--primary); /* Fallback */
+            font-size: 24px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex-grow: 1;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            color: var(--text-gray);
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover {
+            background-color: var(--bg-page);
+            color: var(--text-dark);
+        }
+
+        /* Menu Aktif Sidebar: Pesanan Saya */
+        .nav-link.active {
+            background-color: var(--primary);
+            color: var(--bg-sidebar);
+            font-weight: 600;
+        }
+
+        .nav-link svg {
+            width: 20px;
+            height: 20px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            background-color: var(--bg-page);
+            border-radius: 12px;
+            margin-top: auto;
+        }
+
+        /* Implementasi Wajib: Foto Profil User menggunakan Variabel Global */
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-image: var(--foto-profil);
+            background-size: cover;
+            background-position: center;
+            background-color: #D1E0FF; /* Fallback */
+        }
+
+        .user-info { display: flex; flex-direction: column; gap: 4px; }
+        .user-name { font-size: 13px; font-weight: 700; color: var(--text-dark); }
+        .user-badge {
+            background-color: #F59E0B;
+            color: var(--text-dark);
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* ========================================================
+           5. KONTEN UTAMA (HEADER & GRID)
+           ======================================================== */
+        .page-header {
+            margin-bottom: 32px;
+        }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--primary);
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+        .btn-back:hover { text-decoration: underline; }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 14px;
+            color: var(--text-gray);
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 32px;
+            align-items: start;
+        }
+
+        /* Kartu Umum */
+        .card {
+            background-color: var(--bg-sidebar);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: var(--shadow-card);
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 32px;
+        }
+
+        /* ========================================================
+           6. KIRI: STATUS PENGERJAAN (STEPPER VERTIKAL)
+           ======================================================== */
+        .stepper {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .step {
+            display: flex;
+            gap: 16px;
+            position: relative;
+            padding-bottom: 40px;
+        }
+
+        .step:last-child {
+            padding-bottom: 0;
+        }
+
+        .step-icon-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            width: 36px;
+        }
+
+        .step-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2;
+        }
+
+        /* Warna Status */
+        .step.completed .step-icon { background-color: var(--step-completed); color: white; }
+        .step.active .step-icon { background-color: var(--primary); color: white; box-shadow: 0 0 0 4px #E8F2FF; }
+        .step.pending .step-icon { background-color: #F1F5F9; color: var(--text-light-gray); }
+
+        .step-icon svg { width: 18px; height: 18px; stroke-width: 2.5; }
+
+        /* Garis Vertikal */
+        .step-line {
+            position: absolute;
+            top: 36px;
+            bottom: -8px;
+            width: 2px;
+            background-color: var(--border-color);
+            z-index: 1;
+        }
+
+        .step:last-child .step-line { display: none; }
+        .step.completed .step-line { background-color: var(--border-color); /* Berdasarkan gambar, garis tetap abu muda */ }
+
+        .step-content {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            padding-top: 4px;
+        }
+
+        .step-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .step.active .step-title { color: var(--primary); font-weight: 700; }
+        .step.pending .step-title { color: var(--text-light-gray); font-weight: 500; }
+
+        .step-desc {
+            font-size: 12px;
+            color: var(--text-gray);
+        }
+
+        .step.active .step-desc { color: var(--primary); }
+        .step.pending .step-desc { color: var(--text-light-gray); }
+
+        /* ========================================================
+           7. KANAN: PROFIL MITRA & RINGKASAN PESANAN
+           ======================================================== */
+        .right-column {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* Kartu Mitra */
+        .mitra-card {
+            padding: 24px;
+        }
+
+        .mitra-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 24px;
+        }
+
+        .mitra-profile {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        /* Implementasi Wajib: Foto Profil Mitra menggunakan Variabel Global */
+        .mitra-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 12px;
+            background-image: var(--foto-profil);
+            background-size: cover;
+            background-position: center;
+            background-color: #D1E0FF; /* Fallback */
+        }
+
+        .mitra-info { display: flex; flex-direction: column; gap: 4px; }
+        .mitra-name { font-size: 16px; font-weight: 700; color: var(--text-dark); }
+        .mitra-rating { font-size: 12px; color: var(--text-gray); display: flex; align-items: center; gap: 4px; }
+        .mitra-rating svg { color: var(--gold); fill: var(--gold); }
+
+        .badge-pro {
+            background-color: #E2E8F0;
+            color: var(--text-gray);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 12px;
+        }
+
+        .mitra-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .btn-chat, .btn-wa {
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-chat {
+            background-color: var(--primary);
+            color: white;
+            box-shadow: var(--shadow-btn);
+        }
+        .btn-chat:hover { background-color: var(--primary-hover); }
+
+        .btn-wa {
+            background-color: white;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+        .btn-wa:hover { background-color: #F8FAFC; }
+
+        /* Kartu Ringkasan (Background soft blue) */
+        .summary-card {
+            background-color: #F8FAFC;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+        }
+
+        .summary-header {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-gray);
+            letter-spacing: 0.5px;
+            margin-bottom: 24px;
+            text-transform: uppercase;
+        }
+
+        .summary-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .summary-label {
+            font-size: 14px;
+            color: var(--text-gray);
+        }
+
+        .summary-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-dark);
+            text-align: right;
+        }
+        
+        .val-id { color: var(--primary); }
+        .val-sub { font-size: 11px; color: var(--text-gray); display: block; margin-top: 2px; font-weight: 400; }
+
+        .location-box {
+            background-color: var(--bg-sidebar);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .loc-icon {
+            width: 32px;
+            height: 32px;
+            background-color: #E8F2FF;
+            color: var(--primary);
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .loc-text { display: flex; flex-direction: column; gap: 4px; }
+        .loc-label { font-size: 11px; color: var(--text-gray); }
+        .loc-value { font-size: 13px; font-weight: 600; color: var(--text-dark); line-height: 1.4; }
+
+        /* ========================================================
+           8. FOOTER
+           ======================================================== */
+        footer {
+            background-color: var(--bg-footer);
+            padding: 48px 40px 32px 40px;
+            margin-top: 40px;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            max-width: 1200px;
+            margin: 0 auto;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+
+        .footer-left { max-width: 300px; }
+        .footer-logo { margin-bottom: 16px; }
+        .footer-desc { color: var(--text-gray); font-size: 14px; line-height: 1.6; }
+
+        .footer-links { display: flex; gap: 60px; flex-wrap: wrap; }
+        .link-group h4 { font-size: 14px; color: var(--primary); margin-bottom: 16px; font-weight: 600; }
+        .link-group ul { display: flex; flex-direction: column; gap: 12px; }
+        .link-group a { color: var(--text-gray); font-size: 14px; transition: color 0.2s; }
+        .link-group a:hover { color: var(--primary); }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-gray);
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .footer-bottom {
+            max-width: 1200px;
+            margin: 40px auto 0 auto;
+            padding-top: 24px;
+            border-top: 1px solid rgba(0,0,0,0.05);
+            text-align: center;
+            color: var(--text-gray);
+            font-size: 13px;
+        }
+
+        /* Responsiveness */
+        @media (max-width: 1024px) {
+            .content-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 768px) {
+            .sidebar { display: none; } /* Hide sidebar on mobile for cleaner view */
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR KIRI -->
+    <aside class="sidebar">
+        <!-- Area Logo (Memanggil var(--logo-brand)) -->
+        <div class="brand">
+            <div class="brand-logo-img">
+                <span style="opacity: 0; pointer-events: none;">Resik.in</span>
+            </div>
+        </div>
+
+        <nav class="nav-menu">
+            <a href="dashboard.html" class="nav-link">
+                <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                Dashboard
+            </a>
+            <a href="katalog_layanan.html" class="nav-link">
+                <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+                Layanan
+            </a>
+            <!-- Pesanan Saya Aktif -->
+            <a href="lacak_pesanan.html" class="nav-link">
+                <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                Pesanan Saya
+            </a>
+            <a href="membership.html" class="nav-link">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>
+                Membership
+            </a>
+            <a href="chat_pelanggan.html?id_jasa=7&id_penerima=14">
+                <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                Chat
+            </a>
+            <a href="edit_profil_pelanggan.html" class="nav-link">
+                <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                Profil
+            </a>
+            <a href="laporan_saran.html" class="nav-link">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                Laporan & Saran
+            </a>
+        </nav>
+
+        <!-- Profil Pengguna (Memanggil var(--foto-profil)) -->
+        <div class="user-profile">
+            <div class="user-avatar"></div>
+            <div class="user-info">
+                <div class="user-name">Budi Santoso</div>
+                <div class="user-badge">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                    MEMBER VVIP
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- WRAPPER KONTEN UTAMA -->
+    <div class="main-wrapper">
+        <main class="main-content">
+            
+            <!-- Header Halaman -->
+            <header class="page-header">
+                <button class="btn-back" onclick="location.href='dashboard.html'" title="Kembali">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                    Kembali ke Detail Pesanan
+                </button>
+                <h1 class="page-title">Lacak Pesanan</h1>
+                <p class="page-subtitle">Pesanan Anda sedang diproses oleh mitra kami.</p>
+            </header>
+
+            <div class="content-grid">
+                
+                <!-- KOLOM KIRI: STATUS PENGERJAAN -->
+                <div class="card">
+                    <h2 class="card-title">Status Pengerjaan</h2>
+                    
+                    <div class="stepper">
+                        <!-- Step 1: Pembayaran (Completed) -->
+                        <div class="step completed">
+                            <div class="step-icon-wrapper">
+                                <div class="step-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                </div>
+                                <div class="step-line"></div>
+                            </div>
+                            <div class="step-content">
+                                <span class="step-title">Pembayaran Berhasil</span>
+                                <span class="step-desc">24 Okt 2024, 08:30 WIB</span>
+                            </div>
+                        </div>
+
+                        <!-- Step 2: Mencari Mitra (Completed) -->
+                        <div class="step completed">
+                            <div class="step-icon-wrapper">
+                                <div class="step-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                </div>
+                                <div class="step-line"></div>
+                            </div>
+                            <div class="step-content">
+                                <span class="step-title">Mencari Mitra Terdekat</span>
+                                <span class="step-desc">24 Okt 2024, 08:35 WIB</span>
+                            </div>
+                        </div>
+
+                        <!-- Step 3: Menuju Lokasi (Active) -->
+                        <div class="step active">
+                            <div class="step-icon-wrapper">
+                                <div class="step-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                        <rect x="1" y="3" width="15" height="13"></rect>
+                                        <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+                                        <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                                        <circle cx="18.5" cy="18.5" r="2.5"></circle>
+                                    </svg>
+                                </div>
+                                <div class="step-line"></div>
+                            </div>
+                            <div class="step-content">
+                                <span class="step-title">Mitra Menuju Lokasi Anda</span>
+                                <span class="step-desc">Estimasi tiba dalam 10 menit</span>
+                            </div>
+                        </div>
+
+                        <!-- Step 4: Proses Pembersihan (Pending) -->
+                        <div class="step pending">
+                            <div class="step-icon-wrapper">
+                                <div class="step-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                        <path d="M12 2l3 7 7 3-7 3-3 7-3-7-7-3 7-3 3-7z"></path>
+                                    </svg>
+                                </div>
+                                <div class="step-line"></div>
+                            </div>
+                            <div class="step-content">
+                                <span class="step-title">Proses Pembersihan</span>
+                                <span class="step-desc">Belum dimulai</span>
+                            </div>
+                        </div>
+
+                        <!-- Step 5: Pesanan Selesai (Pending) -->
+                        <div class="step pending">
+                            <div class="step-icon-wrapper">
+                                <div class="step-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                                    </svg>
+                                </div>
+                                <div class="step-line"></div>
+                            </div>
+                            <div class="step-content">
+                                <span class="step-title">Pesanan Selesai</span>
+                                <span class="step-desc">Menunggu konfirmasi</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- KOLOM KANAN: PROFIL & RINGKASAN -->
+                <div class="right-column">
+                    
+                    <!-- Kartu Profil Mitra -->
+                    <div class="card mitra-card">
+                        <div class="mitra-header">
+                            <div class="mitra-profile">
+                                <!-- Memanggil var(--foto-profil) untuk Mitra sesuai instruksi -->
+                                <div class="mitra-avatar"></div>
+                                <div class="mitra-info">
+                                    <span class="mitra-name">Adya Santoso</span>
+                                    <span class="mitra-rating">
+                                        <svg width="14" height="14" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                                        4.9 <span style="color: var(--text-light-gray)">(128 Ulasan)</span>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="badge-pro">Mitra Pro</div>
+                        </div>
+                        <div class="mitra-actions">
+                            <button class="btn-wa" onclick="alert('Membuka WhatsApp...')">
+                                <!-- Ikon WA Hijau sesuai instruksi -->
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                                WhatsApp
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Kartu Ringkasan -->
+                    <div class="summary-card">
+                        <div class="summary-header">RINGKASAN PESANAN</div>
+                        
+                        <div class="summary-list">
+                            <div class="summary-item">
+                                <span class="summary-label">ID Pesanan</span>
+                                <span class="summary-value val-id">#RSK-2901-2024</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">Layanan</span>
+                                <span class="summary-value">Deep Cleaning Kos</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">Jadwal</span>
+                                <span class="summary-value">
+                                    Kamis, 24 Okt 2024
+                                    <span class="val-sub">09:00 WIB</span>
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="location-box">
+                            <div class="loc-icon">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                            </div>
+                            <div class="loc-text">
+                                <span class="loc-label">Lokasi Pengerjaan</span>
+                                <span class="loc-value">Jl. Melati No. 12, Jakarta...</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </main>
+
+        <!-- FOOTER -->
+        <footer>
+            <div class="footer-content">
+                <div class="footer-left">
+                    <div class="footer-logo">
+                        <div class="brand-logo-img">
+                            <span style="opacity: 0; pointer-events: none;">Resik.in</span>
+                        </div>
+                    </div>
+                    <p class="footer-desc">Solusi kebersihan modern untuk hunian dan bisnis Anda di Indonesia.</p>
+                </div>
+                
+                <div class="footer-links">
+                    <div class="link-group">
+                        <h4>Perusahaan</h4>
+                        <ul>
+                            <li><a href="#">Tentang Kami</a></li>
+                            <li><a href="#">Karir</a></li>
+                            <li><a href="#">Blog</a></li>
+                        </ul>
+                    </div>
+                    <div class="link-group">
+                        <h4>Bantuan</h4>
+                        <ul>
+                            <li><a href="#">Bantuan</a></li>
+                            <li><a href="#">Syarat & Ketentuan</a></li>
+                            <li><a href="#">Kebijakan Privasi</a></li>
+                        </ul>
+                    </div>
+                    <div class="link-group">
+                        <h4>Hubungi Kami</h4>
+                        <ul>
+                            <li class="contact-item">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path></svg>
+                                halo@resik.in
+                            </li>
+                            <li class="contact-item">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                                +62 812 3456 7890
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                &copy; 2024 Resik.in. Kebersihan Tanpa Kompromi.
+            </div>
+        </footer>
+    </div>
+<script type="module">
+    import { supabase } from './supabase.js'
+
+    const idPesanan = localStorage.getItem('id_pesanan')
+
+    async function loadLacakPesanan() {
+        if (!idPesanan) return
+
+        const { data, error } = await supabase
+            .from('pesanan')
+            .select('*')
+            .eq('id_pesanan', idPesanan)
+            .single()
+
+        if (error || !data) return
+
+        console.log('Data pesanan:', data)
+        console.log('id_layanan dari pesanan:', data.id_layanan)
+
+        document.querySelector('.val-id').textContent = '#RSK-' + data.id_pesanan
+        document.querySelectorAll('.summary-value')[1].textContent = data.jenis_pesanan
+
+        const tgl = new Date(data.tgl_pesan)
+        const opsiTgl = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }
+        const opsiJam = { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' }
+        document.querySelectorAll('.summary-value')[2].innerHTML = `
+            ${tgl.toLocaleDateString('id-ID', opsiTgl)}
+            <span class="val-sub">${tgl.toLocaleTimeString('id-ID', opsiJam)} WIB</span>
+        `
+
+        updateStepper(data.status)
+
+
+    }
+
+    function updateStepper(status) {
+        const steps = document.querySelectorAll('.step')
+        steps.forEach(s => {
+            s.classList.remove('completed', 'active', 'pending')
+            s.classList.add('pending')
+        })
+
+        if (status === 'menunggu') {
+            steps[0].classList.replace('pending', 'completed')
+            steps[1].classList.replace('pending', 'active')
+        } else if (status === 'diproses') {
+            steps[0].classList.replace('pending', 'completed')
+            steps[1].classList.replace('pending', 'completed')
+            steps[2].classList.replace('pending', 'active')
+        } else if (status === 'selesai') {
+            steps.forEach(s => s.classList.replace('pending', 'completed'))
+        }
+    }
+
+    loadLacakPesanan()
+</script>
+</body>
+</html>

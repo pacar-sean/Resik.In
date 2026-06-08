@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mitra Resik.in - Riwayat Selesai</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --primary-color: #0056D6;
+            --accent-color: #007BFF;
+            --text-dark: #1D2939;
+            --text-gray: #667085;
+            --bg-light: #F8FAFC;
+            --white: #FFFFFF;
+            --border-radius: 12px;
+            --foto-mitra: url('foto-mitra.svg'); 
+            --border-light: #EAECF0;
+            --danger-color: #DC2626;
+            --success-color: #10B981;
+            --success-bg: #D1FAE5;
+            --sidebar-width: 260px;
+            --gold-accent: #FDE047;
+            --bg-footer: #DCE5F5;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif; }
+        body { background-color: var(--bg-light); color: var(--text-dark); display: flex; min-height: 100vh; -webkit-font-smoothing: antialiased; }
+        a { text-decoration: none; color: inherit; }
+        button { cursor: pointer; font-family: inherit; border: none; outline: none; transition: all 0.2s ease; background: transparent; }
+        input { font-family: inherit; outline: none; }
+
+        .sidebar { width: var(--sidebar-width); background-color: var(--white); border-right: 1px solid var(--border-light); display: flex; flex-direction: column; padding: 24px 20px; position: fixed; height: 100vh; z-index: 20; }
+        .brand-logo { font-size: 24px; font-weight: 700; color: var(--primary-color); margin-bottom: 32px; padding-left: 12px; letter-spacing: -0.5px; }
+        .sidebar-profile { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; padding-left: 12px; }
+        .avatar-wrapper { position: relative; width: 48px; height: 48px; }
+        .profile-avatar { width: 100%; height: 100%; border-radius: 50%; background-image: var(--foto-mitra); background-size: cover; background-position: center; background-color: #D1E0FF; border: 2px solid var(--white); }
+        .status-dot { position: absolute; bottom: 2px; right: 0px; width: 12px; height: 12px; background-color: var(--success-color); border-radius: 50%; border: 2px solid var(--white); }
+        .profile-info { display: flex; flex-direction: column; }
+        .profile-name { font-size: 15px; font-weight: 600; color: var(--text-dark); }
+        .profile-status { font-size: 12px; color: var(--text-gray); }
+        .nav-menu { display: flex; flex-direction: column; gap: 4px; flex-grow: 1; }
+        .nav-link { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 8px; color: var(--text-gray); font-weight: 500; font-size: 14px; transition: all 0.2s ease; }
+        .nav-link svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        .nav-link:hover { background-color: var(--bg-light); color: var(--text-dark); }
+        .nav-link.active { background-color: var(--primary-color); color: var(--white); font-weight: 600; }
+        .btn-logout { display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: var(--danger-color); font-weight: 600; font-size: 14px; margin-top: auto; border-radius: 8px; }
+        .btn-logout svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        .btn-logout:hover { background-color: #FEE2E2; }
+
+        .main-wrapper { margin-left: var(--sidebar-width); width: calc(100% - var(--sidebar-width)); display: flex; flex-direction: column; min-height: 100vh; }
+        .main-content { flex-grow: 1; padding: 40px 48px; display: flex; flex-direction: column; }
+        .header-section { display: flex; flex-direction: column; margin-bottom: 32px; }
+        .header-title-group { display: flex; flex-direction: column; gap: 8px; max-width: 600px; margin-bottom: 24px; }
+        .page-title { font-size: 32px; font-weight: 800; color: var(--text-dark); letter-spacing: -0.5px; }
+        .page-subtitle { font-size: 15px; color: var(--text-gray); line-height: 1.5; }
+
+        .tabs-container { display: flex; gap: 32px; border-bottom: 1px solid var(--border-light); margin-bottom: 32px; }
+        .tab-item { padding: 12px 0; font-size: 15px; font-weight: 500; color: var(--text-gray); position: relative; cursor: pointer; display: flex; align-items: center; gap: 8px; margin-bottom: -1px; transition: color 0.2s ease; }
+        .tab-item:hover:not(.active) { color: var(--text-dark); }
+        .tab-item.active { color: var(--primary-color); font-weight: 600; }
+        .tab-item.active::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background-color: var(--primary-color); border-radius: 3px 3px 0 0; }
+        .badge-red { background-color: var(--danger-color); color: var(--white); font-size: 11px; font-weight: 700; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+
+        .performance-row { display: flex; gap: 24px; margin-bottom: 32px; }
+        .achievement-banner { flex: 2; background-color: var(--primary-color); border-radius: 20px; padding: 32px 40px; position: relative; overflow: hidden; color: var(--white); display: flex; flex-direction: column; justify-content: center; box-shadow: 0 10px 25px rgba(0, 86, 214, 0.2); }
+        .achievement-banner::after { content: ''; position: absolute; right: -40px; bottom: -40px; width: 200px; height: 200px; background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>'); background-size: contain; background-repeat: no-repeat; opacity: 0.15; transform: rotate(-10deg); z-index: 1; }
+        .ach-label { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; opacity: 0.8; margin-bottom: 12px; position: relative; z-index: 2; }
+        .ach-title { font-size: 32px; font-weight: 800; line-height: 1.2; margin-bottom: 16px; position: relative; z-index: 2; }
+        .ach-title span { color: var(--gold-accent); }
+        .ach-desc { font-size: 14px; line-height: 1.5; opacity: 0.9; max-width: 90%; position: relative; z-index: 2; }
+
+        .rating-card { flex: 1; background-color: #E8F2FF; border-radius: 20px; padding: 32px; display: flex; flex-direction: column; justify-content: center; border: 1px solid #D1E0FF; }
+        .rating-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+        .star-icon-box { width: 48px; height: 48px; background-color: var(--white); border-radius: 50%; display: flex; justify-content: center; align-items: center; color: var(--primary-color); box-shadow: 0 4px 10px rgba(0,0,0,0.05); flex-shrink: 0; }
+        .star-icon-box svg { width: 24px; height: 24px; fill: currentColor; }
+        .rating-info { display: flex; flex-direction: column; gap: 4px; }
+        .rating-label { font-size: 13px; font-weight: 600; color: var(--text-gray); }
+        .rating-value { font-size: 20px; font-weight: 800; color: var(--text-dark); }
+        .rating-progress-bar { width: 100%; height: 6px; background-color: #CBD5E1; border-radius: 10px; margin-bottom: 12px; overflow: hidden; }
+        .rating-progress-fill { width: 98%; height: 100%; background-color: var(--primary-color); border-radius: 10px; }
+        .rating-desc { font-size: 11px; font-style: italic; color: var(--text-gray); line-height: 1.4; }
+
+        .table-section { background-color: var(--white); border-radius: var(--border-radius); border: 1px solid var(--border-light); box-shadow: 0 2px 12px rgba(0,0,0,0.02); overflow: hidden; display: flex; flex-direction: column; }
+        .table-header-controls { padding: 20px 24px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-light); }
+        .table-title { font-size: 16px; font-weight: 600; color: var(--text-dark); }
+        .table-actions { display: flex; align-items: center; gap: 12px; }
+        .search-box { position: relative; width: 240px; }
+        .search-box input { width: 100%; padding: 10px 16px 10px 40px; border: 1px solid var(--border-light); border-radius: 8px; font-size: 13px; color: var(--text-dark); background-color: var(--bg-light); transition: all 0.2s; }
+        .search-box input:focus { border-color: var(--primary-color); background-color: var(--white); }
+        .search-box svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--text-gray); }
+
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        thead { background-color: var(--white); }
+        th { padding: 16px 24px; font-size: 13px; font-weight: 700; color: var(--text-dark); border-bottom: 1px solid var(--border-light); }
+        td { padding: 20px 24px; font-size: 14px; color: var(--text-dark); border-bottom: 1px solid var(--border-light); vertical-align: middle; }
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background-color: #FAFAFA; }
+
+        .td-date { font-weight: 500; color: var(--text-gray); width: 120px; line-height: 1.4; }
+        .td-amount { font-weight: 700; }
+        .status-badge { display: inline-flex; align-items: center; gap: 6px; background-color: var(--success-bg); color: var(--success-color); font-size: 10px; font-weight: 800; padding: 4px 10px; border-radius: 12px; letter-spacing: 0.5px; }
+        .status-badge .dot { width: 6px; height: 6px; background-color: var(--success-color); border-radius: 50%; }
+
+        .empty-row td { text-align: center; padding: 48px; color: var(--text-gray); font-size: 15px; }
+        .loading-row td { text-align: center; padding: 48px; color: var(--text-gray); font-size: 15px; }
+
+        .pagination-container { padding: 20px 24px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-light); }
+        .pagination-info { font-size: 13px; color: var(--text-gray); }
+
+        footer { background-color: var(--bg-footer); padding: 48px 40px 24px 40px; width: 100%; margin-top: auto; }
+        .footer-content { display: flex; justify-content: space-between; max-width: 1200px; margin: 0 auto; gap: 40px; flex-wrap: wrap; margin-bottom: 40px; }
+        .footer-col { flex: 1; min-width: 200px; }
+        .footer-logo { font-size: 24px; font-weight: 800; color: var(--primary-color); margin-bottom: 16px; letter-spacing: -0.5px; }
+        .footer-desc { font-size: 14px; color: var(--text-gray); line-height: 1.6; }
+        .footer-col h4 { font-size: 14px; color: var(--primary-color); margin-bottom: 20px; font-weight: 600; }
+        .footer-links { display: flex; flex-direction: column; gap: 12px; }
+        .footer-links a { font-size: 14px; color: var(--text-gray); transition: color 0.2s; }
+        .footer-links a:hover { color: var(--primary-color); }
+        .contact-item { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--text-dark); margin-bottom: 12px; font-weight: 500; }
+        .contact-item svg { color: var(--text-gray); width: 18px; height: 18px; stroke-width: 2; }
+        .copyright { text-align: center; font-size: 12px; color: var(--text-gray); padding-top: 24px; border-top: 1px solid rgba(0,0,0,0.05); max-width: 1200px; margin: 0 auto; }
+
+        @media (max-width: 1024px) { .performance-row { flex-direction: column; } }
+        @media (max-width: 768px) { .sidebar { display: none; } .main-wrapper { margin-left: 0; width: 100%; } .main-content { padding: 24px; } .table-section { overflow-x: auto; } table { min-width: 700px; } }
+    </style>
+</head>
+<body>
+
+<aside class="sidebar">
+    <div class="brand-logo">Mitra Resik.in</div>
+    <div class="sidebar-profile">
+        <div class="avatar-wrapper">
+            <div class="profile-avatar"></div>
+            <div class="status-dot"></div>
+        </div>
+        <div class="profile-info">
+            <span class="profile-name" id="sidebar-nama">-</span>
+            <span class="profile-status">Status: Aktif</span>
+        </div>
+    </div>
+    <nav class="nav-menu">
+        <a href="dashboard_mitra.html" class="nav-link">
+            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+            Dashboard
+        </a>
+        <a href="pesanan_masuk_mitra.html" class="nav-link active">
+            <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+            Pesanan
+        </a>
+        <a href="keuangan_mitra.html" class="nav-link">
+            <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
+            Keuangan
+        </a>
+        <a href="layanan_mitra.html" class="nav-link">
+            <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+            Layanan
+        </a>
+        <a href="profil_mitra.html" class="nav-link">
+            <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            Profil
+        </a>
+        <a href="chat_mitra.html" class="nav-link">
+            <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+            Chat
+        </a>
+    </nav>
+    <button class="btn-logout" id="btn-logout">
+        <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+        Keluar
+    </button>
+</aside>
+
+<div class="main-wrapper">
+    <main class="main-content">
+        <div class="header-section">
+            <div class="header-title-group">
+                <h1 class="page-title">Daftar Pesanan</h1>
+                <p class="page-subtitle">Kelola seluruh riwayat pekerjaan Anda dengan mudah.</p>
+            </div>
+            <div class="tabs-container">
+                <a href="pesanan_masuk_mitra.html" class="tab-item">
+                    Pesanan Masuk <span class="badge-red" id="badge-masuk" style="display:none">0</span>
+                </a>
+                <a href="pesanan_berjalan_mitra.html" class="tab-item">Sedang Berjalan</a>
+                <a href="riwayat_pesanan_mitra.html" class="tab-item active">Riwayat Selesai</a>
+            </div>
+        </div>
+
+        <!-- Banner Performa -->
+        <div class="performance-row">
+            <div class="achievement-banner">
+                <span class="ach-label">Pencapaian Bulan Ini</span>
+                <h2 class="ach-title">Total Pesanan Selesai<br>Bulan Ini: <span id="total-selesai">0 Pesanan</span></h2>
+                <p class="ach-desc">Terima kasih atas dedikasi Anda dalam memberikan kebersihan tanpa kompromi kepada setiap pelanggan.</p>
+            </div>
+            <div class="rating-card">
+                <div class="rating-header">
+                    <div class="star-icon-box">
+                        <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                    </div>
+                    <div class="rating-info">
+                        <span class="rating-label">Rating Mitra</span>
+                        <span class="rating-value">4.9 / 5.0</span>
+                    </div>
+                </div>
+                <div class="rating-progress-bar"><div class="rating-progress-fill"></div></div>
+                <p class="rating-desc">Berdasarkan ulasan pelanggan.</p>
+            </div>
+        </div>
+
+        <!-- Tabel Riwayat -->
+        <section class="table-section">
+            <div class="table-header-controls">
+                <h3 class="table-title">Tabel Riwayat Pesanan</h3>
+                <div class="table-actions">
+                    <div class="search-box">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        <input type="text" id="search-input" placeholder="Cari jenis pesanan...">
+                    </div>
+                </div>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tanggal</th>
+                        <th>Jenis Layanan</th>
+                        <th>Tipe</th>
+                        <th>Total Pendapatan</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body">
+                    <tr class="loading-row"><td colspan="5">Memuat riwayat...</td></tr>
+                </tbody>
+            </table>
+
+            <div class="pagination-container">
+                <span class="pagination-info" id="pagination-info">-</span>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-col">
+                <div class="footer-logo">Mitra Resik.in</div>
+                <p class="footer-desc">Solusi kebersihan modern untuk hunian dan bisnis Anda di Indonesia.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Perusahaan</h4>
+                <div class="footer-links"><a href="#">Tentang Kami</a><a href="#">Karir</a><a href="#">Blog</a></div>
+            </div>
+            <div class="footer-col">
+                <h4>Bantuan</h4>
+                <div class="footer-links"><a href="#">Bantuan</a><a href="#">Syarat & Ketentuan</a><a href="#">Kebijakan Privasi</a></div>
+            </div>
+            <div class="footer-col">
+                <h4>Hubungi Kami</h4>
+                <div class="contact-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path></svg>
+                    halo@resik.in
+                </div>
+                <div class="contact-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                    +62 812 3456 7890
+                </div>
+            </div>
+        </div>
+        <div class="copyright">© 2024 Resik.in. Kebersihan Tanpa Kompromi.</div>
+    </footer>
+</div>
+
+<script>
+    const SUPABASE_URL = 'https://dljidtzrnavsvxppdkdb.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRsamlkdHpybmF2c3Z4cHBka2RiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxNTg5NjcsImV4cCI6MjA5NDczNDk2N30.QzqUNPeQt7tEc7hiz6l3JWV4EM2hQP0AoAfRyYQ1M30';
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const userData = JSON.parse(localStorage.getItem('resik_user') || '{}');
+    const idJasa = userData.id_jasa;
+
+    if (!idJasa) {
+        alert('Sesi tidak valid. Silakan login kembali.');
+        window.location.href = 'login_register.html';
+    }
+
+    document.getElementById('sidebar-nama').textContent = userData.nama || 'Mitra';
+
+    document.getElementById('btn-logout').addEventListener('click', () => {
+        localStorage.removeItem('resik_user');
+        window.location.href = 'login_register.html';
+    });
+
+    function formatTanggal(tgl) {
+        if (!tgl) return '-';
+        const d = new Date(tgl);
+        return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+    }
+
+    function formatHarga(harga) {
+        return 'Rp ' + Number(harga).toLocaleString('id-ID');
+    }
+
+    let semuaData = [];
+
+    async function loadData() {
+        // 1. Fetch riwayat selesai
+        const { data: selesai, error } = await supabaseClient
+            .from('pesanan')
+            .select('*')
+            .eq('id_layanan', idJasa)
+            .eq('status', 'selesai')
+            .order('tgl_pesan', { ascending: false });
+
+        if (error) {
+            document.getElementById('table-body').innerHTML =
+                `<tr class="empty-row"><td colspan="5">Gagal memuat data.</td></tr>`;
+            return;
+        }
+
+        semuaData = selesai || [];
+
+        // Update banner pencapaian
+        const bulanIni = new Date().getMonth();
+        const tahunIni = new Date().getFullYear();
+        const selesaiBulanIni = semuaData.filter(p => {
+            const d = new Date(p.tgl_pesan);
+            return d.getMonth() === bulanIni && d.getFullYear() === tahunIni;
+        }).length;
+        document.getElementById('total-selesai').textContent = `${selesaiBulanIni} Pesanan`;
+
+        renderTabel(semuaData);
+
+        // 2. Fetch count pesanan masuk (menunggu) untuk badge
+        const { count } = await supabaseClient
+            .from('pesanan')
+            .select('*', { count: 'exact', head: true })
+            .eq('id_layanan', idJasa)
+            .eq('status', 'menunggu');
+
+        if (count && count > 0) {
+            const badge = document.getElementById('badge-masuk');
+            badge.textContent = count;
+            badge.style.display = 'flex';
+        }
+    }
+
+    function renderTabel(data) {
+        const tbody = document.getElementById('table-body');
+        const info = document.getElementById('pagination-info');
+
+        if (!data || data.length === 0) {
+            tbody.innerHTML = `<tr class="empty-row"><td colspan="5">Belum ada riwayat pesanan selesai.</td></tr>`;
+            info.textContent = '-';
+            return;
+        }
+
+        tbody.innerHTML = data.map(p => `
+            <tr>
+                <td class="td-date">${formatTanggal(p.tgl_pesan)}</td>
+                <td style="font-weight:600; color:var(--primary-color)">${p.jenis_pesanan || '-'}</td>
+                <td>${p.tipe || '-'}</td>
+                <td class="td-amount">${formatHarga(p.harga)}</td>
+                <td><span class="status-badge"><span class="dot"></span> SELESAI</span></td>
+            </tr>
+        `).join('');
+
+        info.textContent = `Menampilkan ${data.length} pesanan selesai.`;
+    }
+
+    // Search/filter
+    document.getElementById('search-input').addEventListener('input', function() {
+        const keyword = this.value.toLowerCase();
+        const filtered = semuaData.filter(p =>
+            (p.jenis_pesanan || '').toLowerCase().includes(keyword) ||
+            (p.tipe || '').toLowerCase().includes(keyword)
+        );
+        renderTabel(filtered);
+    });
+
+    loadData();
+</script>
+</body>
+</html>

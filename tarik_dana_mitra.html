@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mitra Resik.in - Tarik Dana</title>
+    <style>
+        /* ========================================================
+           1. VARIABEL GLOBAL (WAJIB SESUAI PANDUAN)
+           ======================================================== */
+        :root {
+            --primary-color: #0056D6;
+            --accent-color: #007BFF;
+            --text-dark: #1D2939;
+            --text-gray: #667085;
+            --bg-light: #F9FAFB;
+            --white: #FFFFFF;
+            --border-radius: 12px;
+            --foto-mitra: url('foto-mitra.svg'); 
+            
+            /* Variabel Tambahan Internal untuk UI */
+            --danger-color: #DC2626;
+            --success-color: #10B981;
+            --border-color: #EAECF0;
+            --bg-blue-soft: #E8F2FF;
+            --bg-warning: #FEF3C7;
+            --text-warning: #92400E;
+            --icon-warning: #B45309;
+            --bg-footer: #DCE5F5;
+            --sidebar-width: 260px;
+            --shadow-card: 0 8px 24px rgba(0, 0, 0, 0.04);
+        }
+
+        /* ========================================================
+           2. RESET & TYPOGRAPHY DASAR
+           ======================================================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            display: flex;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        a { text-decoration: none; color: inherit; transition: all 0.2s ease; }
+        button { cursor: pointer; border: none; outline: none; background: transparent; font-family: inherit; }
+        input, select { font-family: inherit; outline: none; }
+
+        /* ========================================================
+           3. SIDEBAR NAVIGASI (KIRI)
+           ======================================================== */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--white);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 32px 20px 24px;
+            position: fixed;
+            height: 100vh;
+            z-index: 20;
+            overflow-y: auto;
+        }
+
+        /* Logo Teks Murni */
+        .brand-logo-text {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 36px;
+            padding-left: 12px;
+            letter-spacing: -0.5px;
+        }
+
+        /* Profil Mitra */
+        .sidebar-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 32px;
+            padding-left: 12px;
+        }
+
+        .avatar-wrapper {
+            position: relative;
+            width: 48px;
+            height: 48px;
+        }
+
+        .profile-avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background-image: var(--foto-mitra);
+            background-size: cover;
+            background-position: center;
+            background-color: #D1E0FF; /* Fallback */
+            border: 2px solid var(--white);
+        }
+
+        .status-dot {
+            position: absolute;
+            bottom: 2px;
+            right: 0px;
+            width: 12px;
+            height: 12px;
+            background-color: var(--success-color);
+            border-radius: 50%;
+            border: 2px solid var(--white);
+        }
+
+        .profile-info { display: flex; flex-direction: column; gap: 2px; }
+        .profile-name { font-size: 15px; font-weight: 600; color: var(--text-dark); }
+        .profile-status { font-size: 12px; color: var(--text-gray); }
+
+        /* Menu Navigasi */
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            flex-grow: 1;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            color: var(--text-gray);
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .nav-link svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        .nav-link:hover { background-color: var(--bg-light); color: var(--text-dark); }
+        
+        /* State Aktif - Keuangan */
+        .nav-link.active { background-color: var(--primary-color); color: var(--white); font-weight: 600; }
+
+        /* Tombol Keluar (Pojok Kiri Bawah) */
+        .btn-logout {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            color: var(--danger-color);
+            font-weight: 600;
+            font-size: 14px;
+            margin-top: auto;
+            border-radius: 8px;
+            transition: opacity 0.2s ease;
+        }
+        .btn-logout svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        .btn-logout:hover { opacity: 0.7; }
+
+        /* ========================================================
+           4. KONTEN UTAMA (KANAN)
+           ======================================================== */
+        .main-wrapper {
+            margin-left: var(--sidebar-width);
+            width: calc(100% - var(--sidebar-width));
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header Area */
+        .header-area {
+            margin-bottom: 32px;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+
+        .breadcrumb {
+            font-size: 13px;
+            color: var(--text-gray);
+        }
+        .breadcrumb a { color: var(--text-gray); }
+        .breadcrumb a:hover { color: var(--primary-color); }
+        .breadcrumb span { color: var(--primary-color); font-weight: 500; }
+
+        /* ========================================================
+           5. FORMULIR TARIK DANA (TENGAH)
+           ======================================================== */
+        .form-container {
+            max-width: 600px;
+            width: 100%;
+            margin: 0 auto; /* Tengah secara horizontal */
+        }
+
+        .form-card {
+            background-color: var(--white);
+            border-radius: 20px;
+            padding: 32px;
+            box-shadow: var(--shadow-card);
+            border: 1px solid rgba(234, 236, 240, 0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* Info Saldo Box */
+        .balance-box {
+            background-color: var(--bg-blue-soft);
+            border-radius: 12px;
+            padding: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .balance-text-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .balance-label {
+            font-size: 13px;
+            color: var(--text-gray);
+            font-weight: 500;
+        }
+
+        .balance-amount {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--primary-color);
+            letter-spacing: -0.5px;
+        }
+
+        .balance-icon {
+            width: 48px;
+            height: 48px;
+            background-color: var(--white);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--primary-color);
+            box-shadow: 0 2px 8px rgba(0, 86, 214, 0.1);
+            flex-shrink: 0;
+        }
+        .balance-icon svg { width: 24px; height: 24px; stroke-width: 2; }
+
+        /* Form Input Groups */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            color: var(--text-dark);
+            background-color: var(--white);
+            transition: border-color 0.2s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 86, 214, 0.1);
+        }
+
+        .form-control::placeholder {
+            color: #9CA3AF;
+        }
+
+        /* Custom Select Arrow */
+        select.form-control {
+            appearance: none;
+            cursor: pointer;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23667085' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            background-size: 16px;
+            padding-right: 40px;
+        }
+
+        /* Nominal Input Custom (Rp prefix) */
+        .input-nominal-wrapper {
+            display: flex;
+            align-items: center;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background-color: var(--white);
+            padding: 0 16px;
+            transition: border-color 0.2s ease;
+        }
+
+        .input-nominal-wrapper:focus-within {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 86, 214, 0.1);
+        }
+
+        .currency-prefix {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-right: 8px;
+        }
+
+        .input-nominal-wrapper input {
+            flex-grow: 1;
+            padding: 14px 0;
+            border: none;
+            background: transparent;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .form-hint {
+            font-size: 11px;
+            color: var(--text-gray);
+            font-style: italic;
+            margin-top: 2px;
+        }
+
+        /* Tombol Aksi */
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .btn-submit {
+            background-color: var(--primary-color);
+            color: var(--white);
+            padding: 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            transition: background-color 0.2s ease;
+        }
+
+        .btn-submit:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-cancel {
+            text-align: center;
+            color: var(--text-gray);
+            font-size: 14px;
+            font-weight: 500;
+            width: 100%;
+        }
+
+        .btn-cancel:hover {
+            color: var(--text-dark);
+            text-decoration: underline;
+        }
+
+        /* ========================================================
+           6. KOTAK INFORMASI / WARNING
+           ======================================================== */
+        .info-box {
+            background-color: var(--bg-warning);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            margin-top: 32px;
+            border: 1px solid #FDE68A;
+        }
+
+        .info-icon {
+            color: var(--icon-warning);
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        .info-icon svg { width: 20px; height: 20px; stroke-width: 2; }
+
+        .info-text-content {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .info-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-warning);
+        }
+
+        .info-desc {
+            font-size: 13px;
+            color: var(--text-warning);
+            line-height: 1.5;
+            opacity: 0.9;
+        }
+
+        /* ========================================================
+           7. FOOTER APLIKASI
+           ======================================================== */
+        footer {
+            background-color: var(--bg-footer);
+            padding: 48px 40px 24px 40px;
+            width: 100%;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            max-width: 1200px;
+            margin: 0 auto;
+            gap: 40px;
+            flex-wrap: wrap;
+            margin-bottom: 40px;
+        }
+
+        .footer-col { flex: 1; min-width: 200px; }
+
+        .footer-brand { max-width: 280px; }
+
+        .footer-logo {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--primary-color);
+            margin-bottom: 16px;
+            letter-spacing: -0.5px;
+        }
+
+        .footer-desc {
+            font-size: 14px;
+            color: var(--text-gray);
+            line-height: 1.6;
+        }
+
+        .footer-col h4 {
+            font-size: 14px;
+            color: var(--text-dark);
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .footer-links {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .footer-links a {
+            font-size: 13px;
+            color: var(--text-gray);
+            transition: color 0.2s;
+        }
+        .footer-links a:hover { color: var(--primary-color); }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            color: var(--text-dark);
+            margin-bottom: 12px;
+            font-weight: 500;
+        }
+        .contact-item svg { color: var(--text-gray); width: 16px; height: 16px; stroke-width: 2; }
+
+        .copyright {
+            text-align: left; /* Berdasarkan gambar, copyright sejajar kiri di bawah */
+            font-size: 12px;
+            color: var(--text-gray);
+            padding-top: 24px;
+            border-top: 1px solid rgba(0,0,0,0.05);
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Responsiveness */
+        @media (max-width: 1024px) {
+            .form-container { max-width: 100%; }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; width: 100%; }
+            .main-content { padding: 24px; }
+            .balance-box { flex-direction: column; align-items: flex-start; gap: 16px; }
+            .balance-icon { align-self: flex-end; margin-top: -40px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR KIRI -->
+    <aside class="sidebar">
+        
+        <!-- Logo Teks Sesuai Instruksi -->
+        <div class="brand-logo-text">
+            Mitra Resik.in
+        </div>
+        
+        <!-- Profil Mitra -->
+        <div class="sidebar-profile">
+            <div class="avatar-wrapper">
+                <div class="profile-avatar"></div>
+                <div class="status-dot"></div>
+            </div>
+            <div class="profile-info">
+                <span class="profile-name">Adya Santoso</span>
+                <span class="profile-status">Status: Aktif</span>
+            </div>
+        </div>
+
+        <!-- Menu Navigasi -->
+        <nav class="nav-menu">
+            <a href="dashboard_mitra.html" class="nav-link">
+                <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                Dashboard
+            </a>
+            <a href="pesanan_masuk_mitra.html" class="nav-link">
+                <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                Pesanan
+            </a>
+            <!-- Keuangan Aktif -->
+            <a href="keuangan_mitra.html" class="nav-link">
+                <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
+                Keuangan
+            </a>
+            <a href="layanan_mitra.html" class="nav-link active">
+                <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                Layanan
+            </a>
+            <a href="profil_mitra.html" class="nav-link">
+                <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                Profil
+            </a>
+            <a href="chat_mitra.html" class="nav-link">
+                <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                Chat
+            </a>
+        </nav>
+
+        <!-- Tombol Keluar (Pojok Kiri Bawah) -->
+        <a href="#" class="btn-logout">
+            <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+            Keluar
+        </a>
+    </aside>
+
+    <!-- KONTEN UTAMA KANAN -->
+    <div class="main-wrapper">
+        <main class="main-content">
+            
+            <!-- Header (Judul & Breadcrumb) -->
+            <div class="header-area">
+                <h1 class="page-title">Tarik Dana</h1>
+                <div class="breadcrumb">
+                    <a href="#">Keuangan</a> > <span>Penarikan</span>
+                </div>
+            </div>
+
+            <!-- Form Container Tengah -->
+            <div class="form-container">
+                
+                <!-- Card Putih Utama -->
+                <div class="form-card">
+                    
+                    <!-- Info Saldo Box -->
+                    <div class="balance-box">
+                        <div class="balance-text-group">
+                            <span class="balance-label">Total Saldo Dapat Ditarik</span>
+                            <span class="balance-amount">Rp 750.000</span>
+                        </div>
+                        <div class="balance-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect><line x1="12" y1="16" x2="12" y2="8"></line><polyline points="8 12 12 8 16 12"></polyline></svg>
+                        </div>
+                    </div>
+
+                    <!-- Input 1: Pilih Bank -->
+                    <div class="form-group">
+                        <label class="form-label">Pilih Bank / E-Wallet</label>
+                        <select class="form-control">
+                            <option value="" disabled selected hidden>Pilih tujuan penarikan</option>
+                            <option value="bca">Bank Central Asia (BCA)</option>
+                            <option value="mandiri">Bank Mandiri</option>
+                            <option value="gopay">GoPay</option>
+                            <option value="dana">DANA</option>
+                        </select>
+                    </div>
+
+                    <!-- Input 2: Nomor Rekening -->
+                    <div class="form-group">
+                        <label class="form-label">Nomor Rekening / Nomor Akun</label>
+                        <input type="text" class="form-control" placeholder="Masukkan nomor rekening atau nomor e-wallet">
+                    </div>
+
+                    <!-- Input 3: Nama Pemilik -->
+                    <div class="form-group">
+                        <label class="form-label">Nama Pemilik Rekening</label>
+                        <input type="text" class="form-control" placeholder="Nama harus sesuai dengan bank">
+                    </div>
+
+                    <!-- Input 4: Nominal Penarikan -->
+                    <div class="form-group">
+                        <label class="form-label">Nominal Penarikan</label>
+                        <div class="input-nominal-wrapper">
+                            <span class="currency-prefix">Rp</span>
+                            <input type="text" value="750.000">
+                        </div>
+                        <span class="form-hint">*Minimal penarikan Rp 50.000</span>
+                    </div>
+
+                    <!-- Tombol Aksi Bawah Formulir -->
+                    <div class="action-buttons">
+                        <a href="#" class="btn-submit">
+                            Lanjutkan ke Konfirmasi
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                        </a>
+                        <a href="#" class="btn-cancel">Batal</a>
+                    </div>
+
+                </div>
+
+                <!-- Kotak Informasi Bawah -->
+                <div class="info-box">
+                    <div class="info-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                    </div>
+                    <div class="info-text-content">
+                        <span class="info-title">Informasi Penarikan</span>
+                        <p class="info-desc">Proses penarikan dana membutuhkan waktu 1-3 hari kerja. Pastikan data rekening Anda sudah benar untuk menghindari kegagalan transaksi. Biaya admin mungkin berlaku sesuai dengan kebijakan masing-masing bank/e-wallet.</p>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+
+        <!-- FOOTER APLIKASI -->
+        <footer>
+            <div class="footer-content">
+                
+                <div class="footer-col footer-brand">
+                    <div class="footer-logo">Resik.in</div>
+                    <p class="footer-desc">Solusi kebersihan profesional untuk rumah, kantor, dan apartemen Anda di seluruh Indonesia.</p>
+                </div>
+                
+                <div class="footer-col">
+                    <h4>Tautan</h4>
+                    <div class="footer-links">
+                        <a href="#">Bantuan</a>
+                        <a href="#">Syarat & Ketentuan</a>
+                        <a href="#">Tentang Kami</a>
+                        <a href="#">Kebijakan Privasi</a>
+                    </div>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Layanan</h4>
+                    <div class="footer-links">
+                        <a href="#">Daily Cleaning</a>
+                        <a href="#">Deep Cleaning</a>
+                        <a href="#">Hydro Cleaning</a>
+                        <a href="#">Cuci AC</a>
+                    </div>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Hubungi Kami</h4>
+                    <div class="contact-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path></svg>
+                        halo@resik.in
+                    </div>
+                    <div class="contact-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                        0800-1-RESIK-IN
+                    </div>
+                </div>
+
+            </div>
+            <div class="copyright">
+                © 2024 Resik.in. Kebersihan Tanpa Kompromi.
+            </div>
+        </footer>
+
+    </div>
+
+</body>
+</html>

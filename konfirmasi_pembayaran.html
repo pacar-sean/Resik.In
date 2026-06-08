@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resik.in - Pembayaran Berhasil</title>
+    <style>
+        /* ========================================================
+           1. VARIABEL GLOBAL (WAJIB SESUAI PANDUAN KONSISTENSI)
+           ======================================================== */
+        :root {
+            /* Variabel Aset Utama */
+            --foto-profil: url('avatar.svg');
+            --logo-brand: url('logo.svg');
+            
+            /* Palet Warna Identitas Brand */
+            --primary: #0056D6; 
+            --primary-hover: #0046b0;
+            --success: #10B981; /* Hijau sukses */
+            --success-light: #D1FAE5;
+            --bg-page: #F8FAFC; /* Abu-abu sangat soft untuk background */
+            --bg-white: #FFFFFF;
+            
+            /* Warna Teks */
+            --text-dark: #111827; 
+            --text-gray: #4B5563;
+            --text-light-gray: #9CA3AF;
+            
+            /* Border & Shadow */
+            --border-color: #E5E7EB;
+            --shadow-card: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+            --shadow-btn: 0 4px 12px rgba(0, 86, 214, 0.2);
+        }
+
+        /* ========================================================
+           2. RESET & TYPOGRAPHY DASAR
+           ======================================================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-page);
+            color: var(--text-dark);
+            -webkit-font-smoothing: antialiased;
+            line-height: 1.5;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        button { 
+            cursor: pointer; 
+            border: none; 
+            outline: none; 
+            font-family: inherit; 
+            transition: all 0.2s ease; 
+            background: transparent; 
+        }
+
+        /* ========================================================
+           3. HEADER ATAS (TOP NAVIGATION BAR)
+           ======================================================== */
+        .top-nav {
+            background-color: var(--bg-white);
+            border-bottom: 1px solid var(--border-color);
+            padding: 16px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        /* Implementasi Wajib: Logo menggunakan Variabel Global */
+        .brand-logo {
+            width: 300px;
+            height: 80px;
+            background-image: var(--logo-brand);
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: left center;
+            /* Fallback teks jika file logo.svg belum ada */
+            color: var(--primary);
+            font-size: 24px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+        }
+
+        .secure-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--primary);
+        }
+
+        /* ========================================================
+           4. KONTEN UTAMA TERPUSAT (SUCCESS STATE)
+           ======================================================== */
+        .main-container {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 24px;
+            text-align: center;
+        }
+
+        /* Ikon Ilustrasi Sukses */
+        .success-icon-wrapper {
+            width: 88px;
+            height: 88px;
+            background-color: var(--success);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--bg-white);
+            margin-bottom: 24px;
+            box-shadow: 0 12px 32px rgba(16, 185, 129, 0.25);
+            animation: scaleIn 0.5s ease-out forwards;
+        }
+
+        @keyframes scaleIn {
+            0% { transform: scale(0); opacity: 0; }
+            80% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 12px;
+        }
+
+        .page-subtitle {
+            font-size: 15px;
+            color: var(--text-gray);
+            max-width: 480px;
+            line-height: 1.6;
+            margin-bottom: 32px;
+        }
+
+        /* ========================================================
+           5. KARTU DETAIL TRANSAKSI
+           ======================================================== */
+        .transaction-card {
+            background-color: var(--bg-white);
+            border-radius: 16px;
+            padding: 32px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: var(--shadow-card);
+            border: 1px solid rgba(229, 231, 235, 0.6);
+            text-align: left;
+            margin-bottom: 32px;
+        }
+
+        .tx-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .tx-row:last-of-type {
+            margin-bottom: 0;
+        }
+
+        .tx-label {
+            font-size: 14px;
+            color: var(--text-gray);
+            font-weight: 500;
+        }
+
+        .tx-value {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        /* Grup Value + Tombol Salin */
+        .tx-value-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-copy {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background-color: var(--bg-page);
+            color: var(--primary);
+            border: 1px solid var(--border-color);
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .btn-copy:hover {
+            background-color: var(--bg-light-blue);
+            border-color: var(--primary);
+        }
+
+        /* Pembatas Garis Putus-putus */
+        .dashed-divider {
+            border: none;
+            border-top: 2px dashed var(--border-color);
+            margin: 24px 0;
+        }
+
+        /* Total Pembayaran */
+        .total-row {
+            align-items: center;
+        }
+
+        .tx-label-total {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .tx-value-total {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        /* ========================================================
+           6. BAGIAN TOMBOL AKSI BAWAH
+           ======================================================== */
+        .action-buttons {
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .btn-primary {
+            width: 100%;
+            background-color: var(--primary);
+            color: var(--bg-white);
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            box-shadow: var(--shadow-btn);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 86, 214, 0.25);
+        }
+
+        .btn-secondary {
+            width: 100%;
+            background-color: var(--bg-white);
+            color: var(--text-dark);
+            border: 1px solid var(--border-color);
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-secondary:hover {
+            background-color: #F3F4F6;
+        }
+
+        /* Responsiveness */
+        @media (max-width: 640px) {
+            .top-nav { padding: 16px 20px; }
+            .transaction-card { padding: 24px; }
+            .tx-row { flex-direction: column; align-items: flex-start; gap: 8px; }
+            .tx-value-group { width: 100%; justify-content: space-between; }
+            .total-row { flex-direction: row; align-items: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 1. HEADER ATAS (TOP NAVIGATION BAR) -->
+    <header class="top-nav">
+        <!-- Logo menggunakan Var -->
+        <div class="brand-logo">
+            <span style="opacity: 0; pointer-events: none;">Resik.in</span>
+        </div>
+        
+        <div class="secure-badge">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                <path d="M19 11V7c0-3.866-3.134-7-7-7S5 3.134 5 7v4H4v13h16V11h-1zm-7-9c2.761 0 5 2.239 5 5v4H7V7c0-2.761 2.239-5 5-5zm0 15c-1.105 0-2-.895-2-2s.895-2 2-2 2 .895 2 2-.895 2-2 2z"/>
+            </svg>
+            Pembayaran Aman
+        </div>
+    </header>
+
+    <!-- 2. KONTEN UTAMA TERPUSAT (SUCCESS STATE) -->
+    <main class="main-container">
+        
+        <!-- Ikon Ilustrasi Sukses -->
+        <div class="success-icon-wrapper">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+        </div>
+
+        <h1 class="page-title">Pembayaran Berhasil!</h1>
+        <p class="page-subtitle">Terima kasih! Pembayaran Anda telah kami terima dan pesanan Anda sedang diproses.</p>
+
+        <!-- 3. KARTU DETAIL TRANSAKSI -->
+        <div class="transaction-card">
+            
+            <div class="tx-row">
+                <span class="tx-label">ID Transaksi</span>
+                <div class="tx-value-group">
+                    <span class="tx-value" id="transaction-id">#TX-RESIKIN-99281</span>
+                    <!-- Tombol Salin Interaktif -->
+                    <button class="btn-copy" id="btn-copy">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                        Salin
+                    </button>
+                </div>
+            </div>
+
+            <div class="tx-row">
+                <span class="tx-label">Metode Pembayaran</span>
+                <span class="tx-value">Bank BCA (Transfer Manual)</span>
+            </div>
+
+            <div class="tx-row">
+                <span class="tx-label">Waktu Transaksi</span>
+                <span class="tx-value">24 Oktober 2026, 11:45 WIB</span>
+            </div>
+
+            <!-- Pembatas Garis Putus-putus -->
+            <hr class="dashed-divider">
+
+            <div class="tx-row total-row">
+                <span class="tx-label-total">Total Pembayaran</span>
+                <span class="tx-value-total">Rp 60.500</span>
+            </div>
+
+        </div>
+
+        <!-- 4. BAGIAN TOMBOL AKSI BAWAH -->
+        <div class="action-buttons">
+            <button class="btn-primary" onclick="window.location.href='dashboard.html'">
+                Ke Halaman Dashboard
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+            </button>
+            
+            <button class="btn-secondary" onclick="alert('Mengunduh struk pembayaran...')">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                Unduh Struk Pembayaran
+            </button>
+        </div>
+
+    </main>
+
+    <!-- JAVASCRIPT DASAR UNTUK INTERAKSI -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // Interaksi Salin ID Transaksi ke Clipboard
+            const copyBtn = document.getElementById('btn-copy');
+            const txIdElement = document.getElementById('transaction-id');
+            const originalBtnContent = copyBtn.innerHTML;
+
+            copyBtn.addEventListener('click', function() {
+                const txId = txIdElement.innerText;
+                
+                navigator.clipboard.writeText(txId).then(() => {
+                    // Ubah tampilan tombol sementara menjadi state Sukses
+                    copyBtn.innerHTML = `
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        Tersalin
+                    `;
+                    copyBtn.style.backgroundColor = 'var(--success-light)';
+                    copyBtn.style.color = 'var(--success)';
+                    copyBtn.style.borderColor = 'var(--success)';
+
+                    // Kembalikan ke tampilan semula setelah 2 detik
+                    setTimeout(() => {
+                        copyBtn.innerHTML = originalBtnContent;
+                        copyBtn.style.backgroundColor = ''; 
+                        copyBtn.style.color = '';
+                        copyBtn.style.borderColor = '';
+                    }, 2000);
+                }).catch(err => {
+                    console.error('Gagal menyalin teks: ', err);
+                    alert("Gagal menyalin ID Transaksi.");
+                });
+            });
+
+        });
+    </script>
+</body>
+</html>
